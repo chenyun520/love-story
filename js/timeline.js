@@ -27,6 +27,7 @@ const timelineEvents = [
 class Timeline {
     constructor() {
         this.container = document.getElementById('timeline-container');
+        this.expandedEvent = null; // 当前展开的事件
         this.init();
     }
 
@@ -38,29 +39,50 @@ class Timeline {
     renderEvents() {
         const eventsHtml = timelineEvents.map((event, index) => {
             const position = index % 2 === 0 ? 'left' : 'right';
-            const imageHtml = event.image ? `
-                <div class="event-image-thumbnail">
-                    <img src="images/${event.image}" alt="${event.title}" loading="lazy">
-                    <div class="image-overlay">
-                        <button class="view-full-image" title="查看完整图片">
-                            <i class="fas fa-expand"></i>
-                        </button>
-                    </div>
-                </div>
-            ` : '';
-
+            const categoryEmoji = this.getEventEmoji(event.category);
+            
             return `
                 <div class="timeline-event ${position}" data-date="${event.date}">
-                    <div class="timeline-content">
-                        <div class="event-date">${this.formatDate(event.date)}</div>
-                        <h3 class="event-title">${event.title}</h3>
-                        ${imageHtml}
-                        <p class="event-description">${event.description}</p>
-                        <span class="event-category">${event.category}</span>
-                        <button class="view-event">
-                            <i class="fas fa-eye"></i>
-                            阅览
-                        </button>
+                    <div class="timeline-content timeline-thumbnail" data-event-id="${event.date}">
+                        <!-- 缩略图模式 -->
+                        <div class="event-thumbnail">
+                            <div class="event-date-badge">${this.formatShortDate(event.date)}</div>
+                            <div class="event-category-icon">${categoryEmoji}</div>
+                            <h4 class="event-title-short">${event.title}</h4>
+                            <div class="event-category-tag">${event.category}</div>
+                            <button class="expand-event-btn">
+                                <i class="fas fa-chevron-down"></i>
+                                <span>查看详情</span>
+                            </button>
+                        </div>
+                        
+                        <!-- 详细内容（默认隐藏） -->
+                        <div class="event-details" style="display: none;">
+                            <div class="event-header">
+                                <div class="event-date">${this.formatDate(event.date)}</div>
+                                <button class="collapse-event-btn">
+                                    <i class="fas fa-chevron-up"></i>
+                                </button>
+                            </div>
+                            <h3 class="event-title">${event.title}</h3>
+                            ${event.image ? `
+                                <div class="event-image-container">
+                                    <img src="images/${event.image}" alt="${event.title}" class="event-image" loading="lazy">
+                                    <div class="image-overlay">
+                                        <button class="view-full-image" title="查看完整图片">
+                                            <i class="fas fa-expand"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            <p class="event-description">${event.description}</p>
+                            <div class="event-meta">
+                                <span class="event-category">${event.category}</span>
+                                <div class="memory-tags">
+                                    ${this.generateMemoryTags(event)}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
@@ -70,6 +92,26 @@ class Timeline {
     }
 
     initEventListeners() {
+        // 展开/折叠事件
+        this.container.addEventListener('click', (e) => {
+            const expandBtn = e.target.closest('.expand-event-btn');
+            const collapseBtn = e.target.closest('.collapse-event-btn');
+            
+            if (expandBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                const eventElement = expandBtn.closest('.timeline-event');
+                this.expandEvent(eventElement);
+            }
+            
+            if (collapseBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                const eventElement = collapseBtn.closest('.timeline-event');
+                this.collapseEvent(eventElement);
+            }
+        });
+
         // 图片点击事件
         this.container.addEventListener('click', (e) => {
             const viewImageBtn = e.target.closest('.view-full-image');
@@ -83,20 +125,74 @@ class Timeline {
                 }
             }
         });
+    }
 
-        // 阅览按钮点击事件
-        this.container.addEventListener('click', (e) => {
-            const viewButton = e.target.closest('.view-event');
-            if (viewButton) {
-                e.preventDefault();
-                e.stopPropagation();
-                const eventElement = viewButton.closest('.timeline-event');
-                const eventData = timelineEvents.find(e => e.date === eventElement.dataset.date);
-                if (eventData) {
-                    this.showEventModal(eventData);
-                }
-            }
-        });
+    expandEvent(eventElement) {
+        // 先折叠其他已展开的事件
+        if (this.expandedEvent && this.expandedEvent !== eventElement) {
+            this.collapseEvent(this.expandedEvent);
+        }
+
+        const thumbnail = eventElement.querySelector('.event-thumbnail');
+        const details = eventElement.querySelector('.event-details');
+        const content = eventElement.querySelector('.timeline-content');
+
+        // 添加展开动画
+        content.classList.add('expanding');
+        
+        // 隐藏缩略图
+        thumbnail.style.opacity = '0';
+        setTimeout(() => {
+            thumbnail.style.display = 'none';
+            details.style.display = 'block';
+            details.style.opacity = '0';
+            details.style.transform = 'translateY(20px)';
+            
+            requestAnimationFrame(() => {
+                details.style.opacity = '1';
+                details.style.transform = 'translateY(0)';
+                content.classList.remove('expanding');
+                content.classList.add('expanded');
+            });
+        }, 200);
+
+        this.expandedEvent = eventElement;
+        
+        // 平滑滚动到展开的事件
+        setTimeout(() => {
+            eventElement.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+            });
+        }, 300);
+    }
+
+    collapseEvent(eventElement) {
+        const thumbnail = eventElement.querySelector('.event-thumbnail');
+        const details = eventElement.querySelector('.event-details');
+        const content = eventElement.querySelector('.timeline-content');
+
+        // 添加折叠动画
+        content.classList.add('collapsing');
+        details.style.opacity = '0';
+        details.style.transform = 'translateY(-20px)';
+        
+        setTimeout(() => {
+            details.style.display = 'none';
+            thumbnail.style.display = 'block';
+            thumbnail.style.opacity = '0';
+            thumbnail.style.transform = 'scale(0.9)';
+            
+            requestAnimationFrame(() => {
+                thumbnail.style.opacity = '1';
+                thumbnail.style.transform = 'scale(1)';
+                content.classList.remove('collapsing', 'expanded');
+            });
+        }, 200);
+
+        if (this.expandedEvent === eventElement) {
+            this.expandedEvent = null;
+        }
     }
 
     showImageModal(eventData) {
@@ -150,68 +246,6 @@ class Timeline {
         });
     }
 
-    showEventModal(eventData) {
-        if (document.querySelector('.modal-container')) {
-            return; // 如果已经有模态框，则不再创建新的
-        }
-
-        const modal = document.createElement('div');
-        modal.className = 'modal-container';
-        modal.innerHTML = `
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>${eventData.title}</h3>
-                    <button class="close-modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    ${eventData.image ? `
-                        <img src="images/${eventData.image}" alt="${eventData.title}" class="event-image">
-                    ` : ''}
-                    <div class="event-info">
-                        <div class="event-meta">
-                            <span class="event-date">
-                                <i class="far fa-calendar"></i>
-                                ${this.formatDate(eventData.date)}
-                            </span>
-                            <span class="event-category">
-                                <i class="fas fa-tag"></i>
-                                ${eventData.category}
-                            </span>
-                        </div>
-                        <p class="event-description">${eventData.description}</p>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        document.body.appendChild(modal);
-
-        const closeBtn = modal.querySelector('.close-modal');
-        const closeModal = () => {
-            if (document.body.contains(modal)) {
-                document.body.removeChild(modal);
-                document.body.style.overflow = '';
-                document.removeEventListener('keydown', handleEsc);
-            }
-        };
-
-        const handleEsc = (e) => {
-            if (e.key === 'Escape') {
-                closeModal();
-            }
-        };
-
-        closeBtn.onclick = closeModal;
-        modal.onclick = (e) => {
-            if (e.target === modal) closeModal();
-        };
-        document.addEventListener('keydown', handleEsc);
-
-        requestAnimationFrame(() => {
-            document.body.style.overflow = 'hidden';
-        });
-    }
-
     formatDate(dateString) {
         const date = new Date(dateString);
         return date.toLocaleDateString('zh-CN', {
@@ -221,9 +255,14 @@ class Timeline {
         });
     }
 
+    formatShortDate(dateString) {
+        const date = new Date(dateString);
+        return `${date.getMonth() + 1}/${date.getDate()}`;
+    }
+
     getEventEmoji(category) {
         const emojiMap = {
-            '重要日期': '🎊',
+            '重要时刻': '🎊',
             '日常生活': '🏡',
             '约会': '💑',
             '旅行': '✈️',
@@ -246,7 +285,7 @@ class Timeline {
         
         // 根据类别添加标签
         if (event.category === '约会') tags.push('💑 甜蜜约会');
-        if (event.category === '重要日期') tags.push('🎉 特别时刻');
+        if (event.category === '重要时刻') tags.push('🎉 特别时刻');
         if (event.category === '旅行') tags.push('🌍 旅行记忆');
         
         // 根据描述内容添加标签

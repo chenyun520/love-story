@@ -94,13 +94,20 @@ function initCreativeModule() {
 
 // 初始化心愿清单
 function initWishlist() {
+    // 自动标记过期心愿为完成
+    autoMarkExpiredWishes();
+    
     const wishlistContainer = document.getElementById('wishlist-container');
     
     // 清空容器
     wishlistContainer.innerHTML = '';
     
-    // 按优先级和日期排序
-    const sortedWishlist = [...wishlistData].sort((a, b) => {
+    // 分离活跃和已完成的心愿
+    const activeWishes = wishlistData.filter(wish => !wish.completed);
+    const completedWishes = wishlistData.filter(wish => wish.completed);
+    
+    // 按优先级和日期排序活跃心愿
+    const sortedActiveWishes = [...activeWishes].sort((a, b) => {
         const priorityOrder = { '高': 0, '中': 1, '低': 2 };
         if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
             return priorityOrder[a.priority] - priorityOrder[b.priority];
@@ -108,11 +115,78 @@ function initWishlist() {
         return new Date(a.targetDate) - new Date(b.targetDate);
     });
     
-    // 创建心愿清单
-    sortedWishlist.forEach(wish => {
-        const wishElement = createWishElement(wish);
-        wishlistContainer.appendChild(wishElement);
-    });
+    // 创建活跃心愿清单
+    const activeWishesContainer = document.createElement('div');
+    activeWishesContainer.className = 'active-wishes-container';
+    
+    if (sortedActiveWishes.length > 0) {
+        const activeWishesTitle = document.createElement('h3');
+        activeWishesTitle.className = 'wishes-section-title';
+        activeWishesTitle.innerHTML = '<i class="fas fa-star"></i> 待实现的心愿';
+        activeWishesContainer.appendChild(activeWishesTitle);
+        
+        sortedActiveWishes.forEach(wish => {
+            const wishElement = createWishElement(wish);
+            activeWishesContainer.appendChild(wishElement);
+        });
+    } else {
+        const emptyMessage = document.createElement('div');
+        emptyMessage.className = 'empty-wishes';
+        emptyMessage.innerHTML = `
+            <div class="empty-wishes-content">
+                <i class="fas fa-heart"></i>
+                <h3>还没有心愿</h3>
+                <p>添加一些美好的心愿吧！</p>
+            </div>
+        `;
+        activeWishesContainer.appendChild(emptyMessage);
+    }
+    
+    wishlistContainer.appendChild(activeWishesContainer);
+    
+    // 创建已完成心愿折叠区域
+    if (completedWishes.length > 0) {
+        const completedWishesContainer = document.createElement('div');
+        completedWishesContainer.className = 'completed-wishes-container';
+        
+        // 创建折叠标题
+        const completedWishesHeader = document.createElement('div');
+        completedWishesHeader.className = 'completed-wishes-header';
+        completedWishesHeader.innerHTML = `
+            <div class="completed-wishes-toggle">
+                <i class="fas fa-chevron-right toggle-icon"></i>
+                <i class="fas fa-check-circle completed-icon"></i>
+                <span class="completed-title">已经完成的心愿</span>
+                <span class="completed-count">(${completedWishes.length})</span>
+            </div>
+        `;
+        
+        // 创建折叠内容
+        const completedWishesContent = document.createElement('div');
+        completedWishesContent.className = 'completed-wishes-content';
+        completedWishesContent.style.display = 'none';
+        
+        // 按完成时间排序（最新完成的在前）
+        const sortedCompletedWishes = [...completedWishes].sort((a, b) => {
+            return new Date(b.completedDate || b.targetDate) - new Date(a.completedDate || a.targetDate);
+        });
+        
+        sortedCompletedWishes.forEach(wish => {
+            const wishElement = createWishElement(wish);
+            wishElement.classList.add('completed-wish-item');
+            completedWishesContent.appendChild(wishElement);
+        });
+        
+        completedWishesContainer.appendChild(completedWishesHeader);
+        completedWishesContainer.appendChild(completedWishesContent);
+        
+        // 添加折叠/展开事件
+        completedWishesHeader.addEventListener('click', () => {
+            toggleCompletedWishes(completedWishesHeader, completedWishesContent);
+        });
+        
+        wishlistContainer.appendChild(completedWishesContainer);
+    }
     
     // 添加"添加新心愿"按钮
     const addWishButton = document.createElement('div');
@@ -120,6 +194,66 @@ function initWishlist() {
     addWishButton.innerHTML = '<i class="fas fa-plus"></i> 添加新心愿';
     addWishButton.addEventListener('click', showAddWishForm);
     wishlistContainer.appendChild(addWishButton);
+}
+
+// 自动标记过期心愿为完成
+function autoMarkExpiredWishes() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    let markedCount = 0;
+    
+    wishlistData.forEach(wish => {
+        if (!wish.completed) {
+            const targetDate = new Date(wish.targetDate);
+            targetDate.setHours(0, 0, 0, 0);
+            
+            // 如果目标日期已过，自动标记为完成
+            if (targetDate < today) {
+                wish.completed = true;
+                wish.completedDate = wish.targetDate; // 记录完成日期
+                wish.autoCompleted = true; // 标记为自动完成
+                markedCount++;
+            }
+        }
+    });
+    
+    // 如果有心愿被自动标记为完成，显示通知
+    if (markedCount > 0) {
+        setTimeout(() => {
+            showNotification(`${markedCount} 个过期心愿已自动标记为完成`);
+        }, 1000);
+    }
+}
+
+// 折叠/展开已完成心愿
+function toggleCompletedWishes(header, content) {
+    const toggleIcon = header.querySelector('.toggle-icon');
+    const isExpanded = content.style.display !== 'none';
+    
+    if (isExpanded) {
+        // 折叠
+        content.style.opacity = '0';
+        content.style.transform = 'translateY(-10px)';
+        
+        setTimeout(() => {
+            content.style.display = 'none';
+            toggleIcon.style.transform = 'rotate(0deg)';
+            header.classList.remove('expanded');
+        }, 200);
+    } else {
+        // 展开
+        content.style.display = 'block';
+        content.style.opacity = '0';
+        content.style.transform = 'translateY(-10px)';
+        
+        requestAnimationFrame(() => {
+            content.style.opacity = '1';
+            content.style.transform = 'translateY(0)';
+            toggleIcon.style.transform = 'rotate(90deg)';
+            header.classList.add('expanded');
+        });
+    }
 }
 
 // 创建单个心愿元素
@@ -133,16 +267,33 @@ function createWishElement(wish) {
     
     const daysLeft = Math.ceil((targetDate - new Date()) / (1000 * 60 * 60 * 24));
     let daysLeftText = '';
+    let daysLeftClass = '';
     
-    if (daysLeft > 0) {
-        daysLeftText = `还有 ${daysLeft} 天`;
-    } else if (daysLeft === 0) {
-        daysLeftText = '就是今天！';
+    if (wish.completed) {
+        if (wish.autoCompleted) {
+            daysLeftText = '已过期自动完成';
+            daysLeftClass = 'auto-completed';
+        } else {
+            daysLeftText = '已完成';
+            daysLeftClass = 'manually-completed';
+        }
     } else {
-        daysLeftText = `已过期 ${Math.abs(daysLeft)} 天`;
+        if (daysLeft > 0) {
+            daysLeftText = `还有 ${daysLeft} 天`;
+            daysLeftClass = daysLeft <= 7 ? 'urgent' : 'normal';
+        } else if (daysLeft === 0) {
+            daysLeftText = '就是今天！';
+            daysLeftClass = 'today';
+        } else {
+            daysLeftText = `已过期 ${Math.abs(daysLeft)} 天`;
+            daysLeftClass = 'overdue';
+        }
     }
     
     const priorityClass = `priority-${wish.priority === '高' ? 'high' : wish.priority === '中' ? 'medium' : 'low'}`;
+    
+    // 为自动完成的心愿添加特殊图标
+    const autoCompletedIcon = wish.autoCompleted ? '<i class="fas fa-clock auto-completed-icon" title="自动完成"></i>' : '';
     
     wishElement.innerHTML = `
         <div class="wish-header">
@@ -150,14 +301,14 @@ function createWishElement(wish) {
                 <input type="checkbox" class="wish-checkbox" ${wish.completed ? 'checked' : ''}>
                 <span class="checkmark"></span>
             </div>
-            <h3 class="wish-title">${wish.title}</h3>
+            <h3 class="wish-title">${wish.title} ${autoCompletedIcon}</h3>
             <div class="wish-priority ${priorityClass}">${wish.priority}优先级</div>
         </div>
         <div class="wish-body">
             <p class="wish-description">${wish.description}</p>
             <div class="wish-meta">
                 <span class="wish-date">目标日期: ${formattedDate}</span>
-                <span class="wish-days-left">${daysLeftText}</span>
+                <span class="wish-days-left ${daysLeftClass}">${daysLeftText}</span>
             </div>
         </div>
         <div class="wish-actions">
@@ -397,13 +548,18 @@ function toggleWishCompleted(id, completed) {
     // 更新完成状态
     wishlistData[wishIndex].completed = completed;
     
-    // 更新UI
-    const wishElement = document.querySelector(`.wish-item[data-id="${id}"]`);
     if (completed) {
-        wishElement.classList.add('completed');
+        // 如果是手动标记为完成，记录完成日期
+        wishlistData[wishIndex].completedDate = new Date().toISOString().split('T')[0];
+        wishlistData[wishIndex].autoCompleted = false; // 标记为手动完成
     } else {
-        wishElement.classList.remove('completed');
+        // 如果取消完成，清除完成相关标记
+        delete wishlistData[wishIndex].completedDate;
+        delete wishlistData[wishIndex].autoCompleted;
     }
+    
+    // 重新初始化心愿清单（这样会重新分组）
+    initWishlist();
     
     // 显示成功消息
     showNotification(completed ? '心愿已标记为完成！' : '心愿已标记为未完成！');
