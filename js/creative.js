@@ -886,6 +886,10 @@ function startRealTimeCountdown(targetDate) {
 function initDailyQuote() {
     const quotes = [
         {
+            text: "你让整座城市都断电，颠倒了每个白天黑夜",
+            author: "黄礼格"
+        },
+        {
             text: "爱情是灵魂的共鸣，心灵的对话。",
             author: "柏拉图"
         },
@@ -915,11 +919,23 @@ function initDailyQuote() {
         }
     ];
     
-    // 根据日期选择一句话（这样每天都是固定的）
+    // 获取今天的日期
     const today = new Date();
-    const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
-    const quoteIndex = dayOfYear % quotes.length;
-    const todayQuote = quotes[quoteIndex];
+    const todayString = today.toDateString();
+    
+    // 检查是否是特定日期，如果是则显示黄礼格的句子
+    const specialDate = new Date('2025-01-15').toDateString(); // 今天的日期
+    let todayQuote;
+    
+    if (todayString === specialDate) {
+        // 今天显示黄礼格的句子
+        todayQuote = quotes[0];
+    } else {
+        // 其他日期按原逻辑选择
+        const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+        const quoteIndex = (dayOfYear % (quotes.length - 1)) + 1; // 跳过第一个特殊句子
+        todayQuote = quotes[quoteIndex];
+    }
     
     const quoteContainer = document.getElementById('quote-container');
     
