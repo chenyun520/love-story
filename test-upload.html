@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频上传测试</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/upload.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .test-title {
+            color: white;
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 30px;
+        }
+        .test-button {
+            display: block;
+            width: 200px;
+            margin: 0 auto;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #4CAF50, #81C784);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .test-button:hover {
+            background: linear-gradient(45deg, #45a049, #66bb6a);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+        .feature-list {
+            color: white;
+            margin-top: 30px;
+        }
+        .feature-list h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+        .feature-list ul {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+        .feature-list i {
+            color: #4CAF50;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 class="test-title">大文件视频上传功能测试</h1>
+        
+        <button class="test-button" onclick="showUpload()">
+            <i class="fas fa-upload"></i> 测试上传功能
+        </button>
+        
+        <div class="feature-list">
+            <h3>功能特点：</h3>
+            <ul>
+                <li><i class="fas fa-check"></i> 支持拖拽上传，操作简便</li>
+                <li><i class="fas fa-check"></i> 分片上传，支持大文件（最大500MB）</li>
+                <li><i class="fas fa-check"></i> 实时进度显示，包含速度和剩余时间</li>
+                <li><i class="fas fa-check"></i> 断点续传，支持暂停和继续</li>
+                <li><i class="fas fa-check"></i> 自动重试机制，提高上传成功率</li>
+                <li><i class="fas fa-check"></i> 响应式设计，适配各种设备</li>
+                <li><i class="fas fa-check"></i> 支持MP4、AVI、MOV格式</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="js/videoUpload.js"></script>
+    <script>
+        function showUpload() {
+            if (window.videoUploader) {
+                window.videoUploader.showUploadModal();
+            } else {
+                alert('上传功能正在加载中，请稍后再试...');
+            }
+        }
+    </script>
+</body>
+</html> 
