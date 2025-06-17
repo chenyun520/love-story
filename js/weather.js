@@ -1,5 +1,5 @@
 /**
- * 天气小工具模块
+ * 天气小工具模块 - 折叠式设计
  */
 const WeatherWidget = {
     config: {
@@ -20,6 +20,7 @@ const WeatherWidget = {
             }
         ],
         currentCityIndex: 0,
+        isExpanded: false, // 新增：跟踪展开状态
         weatherIcons: {
             '晴': '🍔',
             '多云': '🍔',
@@ -41,14 +42,12 @@ const WeatherWidget = {
     },
 
     init() {
+        this.createWeatherWidget();
         this.updateDateTime();
-        const cityNameElement = document.querySelector('.city-name');
-        const currentCity = this.config.cities[this.config.currentCityIndex];
-        cityNameElement.textContent = `${currentCity.name} (${currentCity.label})`;
-        
         this.simulateWeather();
-        this.setupCitySwitch();
+        this.setupEventListeners();
         
+        // 定时更新
         setInterval(() => {
             this.updateDateTime();
         }, 1000);
@@ -58,68 +57,181 @@ const WeatherWidget = {
         }, 30 * 60 * 1000);
     },
 
-    setupCitySwitch() {
-        const locationElement = document.querySelector('.weather-location');
-        const switchButton = document.createElement('button');
-        switchButton.className = 'city-switch-btn';
-        switchButton.innerHTML = '切换城市';
-        switchButton.setAttribute('aria-label', '切换城市');
+    createWeatherWidget() {
+        const widget = document.querySelector('.weather-widget');
+        const currentCity = this.config.cities[this.config.currentCityIndex];
         
-        switchButton.addEventListener('click', () => {
-            this.switchCity();
-            switchButton.classList.add('switching');
-            setTimeout(() => {
-                switchButton.classList.remove('switching');
-            }, 500);
+        widget.innerHTML = `
+            <!-- 折叠状态 - 只显示图标 -->
+            <div class="weather-collapsed" id="weather-collapsed">
+                <div class="weather-toggle-icon" id="weather-icon">${currentCity.icon}</div>
+                <div class="weather-mini-info">
+                    <span class="mini-temp" id="mini-temp">--°</span>
+                </div>
+            </div>
+            
+            <!-- 展开状态 - 完整信息 -->
+            <div class="weather-expanded" id="weather-expanded">
+                <div class="weather-header">
+                    <div class="weather-icon-large" id="weather-icon-large">${currentCity.icon}</div>
+                    <div class="weather-info">
+                        <div class="weather-location">
+                            <span class="city-name">${currentCity.name} (${currentCity.label})</span>
+                        </div>
+                        <div class="weather-date" id="weather-date"></div>
+                    </div>
+                    <button class="weather-close-btn" id="weather-close-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="weather-main">
+                    <div class="weather-temp" id="weather-temp">--°C</div>
+                    <div class="weather-desc" id="weather-desc">--</div>
+                </div>
+                <div class="weather-details">
+                    <div class="weather-detail-item">
+                        <i class="fas fa-tint"></i>
+                        <span id="weather-humidity">--</span>
+                    </div>
+                    <div class="weather-detail-item">
+                        <i class="fas fa-wind"></i>
+                        <span id="weather-wind">--</span>
+                    </div>
+                </div>
+                <div class="weather-suggestion">
+                    <i class="fas fa-tshirt"></i>
+                    <span id="weather-clothing">--</span>
+                </div>
+                <div class="weather-actions">
+                    <button class="city-switch-btn" id="city-switch-btn">切换城市</button>
+                </div>
+            </div>
+        `;
+        
+        // 设置初始样式
+        widget.style.background = currentCity.bgGradient;
+    },
+
+    setupEventListeners() {
+        const collapsedArea = document.getElementById('weather-collapsed');
+        const closeBtn = document.getElementById('weather-close-btn');
+        const switchBtn = document.getElementById('city-switch-btn');
+        
+        // 点击折叠区域展开
+        collapsedArea.addEventListener('click', () => {
+            this.toggleWeather(true);
         });
         
-        // 将按钮添加到城市名称后面
-        locationElement.appendChild(switchButton);
+        // 点击关闭按钮折叠
+        closeBtn.addEventListener('click', () => {
+            this.toggleWeather(false);
+        });
+        
+        // 切换城市
+        switchBtn.addEventListener('click', () => {
+            this.switchCity();
+        });
+    },
+
+    toggleWeather(expand) {
+        const widget = document.querySelector('.weather-widget');
+        const collapsed = document.getElementById('weather-collapsed');
+        const expanded = document.getElementById('weather-expanded');
+        
+        this.config.isExpanded = expand;
+        
+        if (expand) {
+            // 展开动画
+            widget.classList.add('expanding');
+            collapsed.style.opacity = '0';
+            collapsed.style.transform = 'scale(0.8)';
+            
+            setTimeout(() => {
+                collapsed.style.display = 'none';
+                expanded.style.display = 'block';
+                expanded.style.opacity = '0';
+                expanded.style.transform = 'translateY(20px)';
+                
+                requestAnimationFrame(() => {
+                    expanded.style.opacity = '1';
+                    expanded.style.transform = 'translateY(0)';
+                    widget.classList.remove('expanding');
+                    widget.classList.add('expanded');
+                });
+            }, 200);
+        } else {
+            // 折叠动画
+            widget.classList.add('collapsing');
+            expanded.style.opacity = '0';
+            expanded.style.transform = 'translateY(-20px)';
+            
+            setTimeout(() => {
+                expanded.style.display = 'none';
+                collapsed.style.display = 'flex';
+                collapsed.style.opacity = '0';
+                collapsed.style.transform = 'scale(1.2)';
+                
+                requestAnimationFrame(() => {
+                    collapsed.style.opacity = '1';
+                    collapsed.style.transform = 'scale(1)';
+                    widget.classList.remove('collapsing', 'expanded');
+                });
+            }, 200);
+        }
     },
 
     switchCity() {
+        const switchBtn = document.getElementById('city-switch-btn');
+        const iconLarge = document.getElementById('weather-icon-large');
+        const iconSmall = document.getElementById('weather-icon');
         const cityName = document.querySelector('.city-name');
-        const weatherIcon = document.getElementById('weather-icon');
         const widget = document.querySelector('.weather-widget');
         
+        switchBtn.classList.add('switching');
+        
+        // 动画效果
+        iconLarge.style.transform = 'scale(0.5) rotate(180deg)';
+        iconSmall.style.transform = 'scale(0.5) rotate(180deg)';
         cityName.style.opacity = '0';
-        cityName.style.transform = 'translateY(-10px)';
-        weatherIcon.style.opacity = '0';
-        weatherIcon.style.transform = 'scale(0.8)';
         
         setTimeout(() => {
+            // 切换到下一个城市
             this.config.currentCityIndex = (this.config.currentCityIndex + 1) % this.config.cities.length;
             const currentCity = this.config.cities[this.config.currentCityIndex];
             
+            // 更新城市信息
+            iconLarge.textContent = currentCity.icon;
+            iconSmall.textContent = currentCity.icon;
             cityName.textContent = `${currentCity.name} (${currentCity.label})`;
-            weatherIcon.textContent = currentCity.icon;
-            weatherIcon.style.fontSize = currentCity.icon === '👧' ? '60px' : '40px';
             widget.style.background = currentCity.bgGradient;
             
+            // 恢复动画
+            iconLarge.style.transform = 'scale(1) rotate(0deg)';
+            iconSmall.style.transform = 'scale(1) rotate(0deg)';
             cityName.style.opacity = '1';
-            cityName.style.transform = 'translateY(0)';
-            weatherIcon.style.opacity = '1';
-            weatherIcon.style.transform = 'scale(1)';
+            switchBtn.classList.remove('switching');
             
+            // 重新获取天气数据
             this.simulateWeather();
         }, 300);
     },
 
     updateDateTime() {
         const dateElement = document.getElementById('weather-date');
-        const now = new Date();
-        const options = { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        };
-        dateElement.textContent = now.toLocaleDateString('zh-CN', options);
+        if (dateElement) {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            dateElement.textContent = now.toLocaleDateString('zh-CN', options);
+        }
     },
 
-    // 模拟天气数据（实际项目中应该调用真实的天气API）
     simulateWeather() {
         const weatherTypes = ['晴', '多云', '阴', '小雨', '中雨'];
         const randomWeather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
@@ -144,32 +256,20 @@ const WeatherWidget = {
     },
 
     updateWeatherUI(data) {
+        // 更新展开状态的元素
         const tempElement = document.getElementById('weather-temp');
-        tempElement.textContent = `${data.temperature}°C`;
-
+        const miniTempElement = document.getElementById('mini-temp');
         const descElement = document.getElementById('weather-desc');
-        descElement.textContent = data.weather;
-        
-        const iconElement = document.getElementById('weather-icon');
-        const currentCity = this.config.cities[this.config.currentCityIndex];
-        iconElement.textContent = currentCity.icon;
-        iconElement.style.fontSize = currentCity.icon === '👧' ? '60px' : '40px'; // 女生头像更大
-        iconElement.style.lineHeight = '1';
-        iconElement.style.display = 'flex';
-        iconElement.style.alignItems = 'center';
-        iconElement.style.justifyContent = 'center';
-
         const humidityElement = document.getElementById('weather-humidity');
-        humidityElement.textContent = `湿度 ${data.humidity}%`;
-
         const windElement = document.getElementById('weather-wind');
-        windElement.textContent = `风速 ${data.windSpeed}km/h`;
-
         const clothingElement = document.getElementById('weather-clothing');
-        clothingElement.textContent = this.getClothingSuggestion(data.temperature);
-
-        const widget = document.querySelector('.weather-widget');
-        widget.style.background = currentCity.bgGradient;
+        
+        if (tempElement) tempElement.textContent = `${data.temperature}°C`;
+        if (miniTempElement) miniTempElement.textContent = `${data.temperature}°`;
+        if (descElement) descElement.textContent = data.weather;
+        if (humidityElement) humidityElement.textContent = `湿度 ${data.humidity}%`;
+        if (windElement) windElement.textContent = `风速 ${data.windSpeed}km/h`;
+        if (clothingElement) clothingElement.textContent = this.getClothingSuggestion(data.temperature);
     },
 
     getWeatherBackground(weather) {
