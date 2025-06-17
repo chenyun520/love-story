@@ -27,7 +27,7 @@ const timelineEvents = [
         title: '加好友的第一天',
         description: '一切都源自一次简单的自我介绍',
         category: '重要时刻',
-        image: '加好友.jpg'
+        image: '加好友的那天.jpg'
     }
 ];
 
