@@ -39,7 +39,6 @@ class Timeline {
     renderEvents() {
         const eventsHtml = timelineEvents.map((event, index) => {
             const position = index % 2 === 0 ? 'left' : 'right';
-            const categoryEmoji = this.getEventEmoji(event.category);
             
             return `
                 <div class="timeline-event ${position}" data-date="${event.date}">
@@ -47,7 +46,15 @@ class Timeline {
                         <!-- 缩略图模式 -->
                         <div class="event-thumbnail">
                             <div class="event-date-badge">${this.formatShortDate(event.date)}</div>
-                            <div class="event-category-icon">${categoryEmoji}</div>
+                            ${event.image ? `
+                                <div class="event-photo-thumbnail">
+                                    <img src="images/${event.image}" alt="${event.title}" loading="lazy">
+                                </div>
+                            ` : `
+                                <div class="event-no-photo">
+                                    <i class="fas fa-heart"></i>
+                                </div>
+                            `}
                             <h4 class="event-title-short">${event.title}</h4>
                             <div class="event-category-tag">${event.category}</div>
                             <button class="expand-event-btn">

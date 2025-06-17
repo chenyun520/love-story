@@ -396,7 +396,7 @@ main {
     box-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
 }
 
-/* 装饰元素 - 顶部 */
+/* 装饰元素 - 顶部彩虹 */
 .timeline-container::after {
     content: '🌈';
     position: absolute;
@@ -422,7 +422,7 @@ main {
     left: 55%;
 }
 
-/* 左侧装饰元素 */
+/* 简化装饰元素 - 只保留爱心和星星 */
 .timeline-event.left::before {
     content: '❤️';
     position: absolute;
@@ -433,7 +433,7 @@ main {
 }
 
 .timeline-event.left::after {
-    content: '🌟';
+    content: '⭐';
     position: absolute;
     right: -60px;
     top: 40px;
@@ -441,7 +441,6 @@ main {
     animation: sparkle 2s infinite;
 }
 
-/* 右侧装饰元素 */
 .timeline-event.right::before {
     content: '⭐';
     position: absolute;
@@ -452,7 +451,7 @@ main {
 }
 
 .timeline-event.right::after {
-    content: '✨';
+    content: '❤️';
     position: absolute;
     left: -60px;
     top: 40px;
@@ -460,14 +459,14 @@ main {
     animation: sparkle 2s infinite;
 }
 
-/* 特殊日期装饰 */
-.timeline-event[data-date="2025-05-02"]::before {
-    content: '💑';
+/* 特殊日期装饰 - 相遇纪念日 */
+.timeline-event[data-date="2025-03-30"]::before {
+    content: '💕';
     font-size: 24px;
 }
 
-.timeline-event[data-date="2025-05-02"]::after {
-    content: '🎉';
+.timeline-event[data-date="2025-03-30"]::after {
+    content: '✨';
     font-size: 20px;
     animation: bounce 2s infinite;
 }
@@ -564,10 +563,48 @@ main {
     margin-bottom: 10px;
 }
 
-.event-category-icon {
+/* 照片缩略图样式 */
+.event-photo-thumbnail {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 10px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--primary-color);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+    transition: all 0.3s ease;
+}
+
+.event-photo-thumbnail:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+}
+
+.event-photo-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.event-photo-thumbnail:hover img {
+    transform: scale(1.1);
+}
+
+/* 无照片时的样式 */
+.event-no-photo {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 10px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
     font-size: 2rem;
-    margin-bottom: 8px;
-    animation: bounce 2s infinite;
+    animation: heartBeat 2s infinite;
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
 }
 
 .event-title-short {
@@ -789,7 +826,14 @@ main {
         padding: 12px;
     }
     
-    .event-category-icon {
+    /* 移动端照片缩略图优化 */
+    .event-photo-thumbnail,
+    .event-no-photo {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .event-no-photo {
         font-size: 1.5rem;
     }
     
