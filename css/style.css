@@ -547,37 +547,42 @@ main {
 
 /* 缩略图模式样式 */
 .event-thumbnail {
-    padding: 15px;
-    text-align: center;
+    padding: 10px 15px;
     transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
 }
 
 .event-date-badge {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
     font-weight: 600;
-    display: inline-block;
-    margin-bottom: 10px;
+    min-width: 80px;
+    text-align: center;
+    flex-shrink: 0;
+    line-height: 1.2;
 }
 
-/* 照片缩略图样式 */
+/* 照片缩略图样式 - 紧凑版 */
 .event-photo-thumbnail {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 10px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     overflow: hidden;
-    border: 3px solid var(--primary-color);
-    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
     transition: all 0.3s ease;
+    flex-shrink: 0;
 }
 
 .event-photo-thumbnail:hover {
     transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
 }
 
 .event-photo-thumbnail img {
@@ -591,61 +596,70 @@ main {
     transform: scale(1.1);
 }
 
-/* 无照片时的样式 */
+/* 无照片时的样式 - 紧凑版 */
 .event-no-photo {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 10px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 2rem;
+    font-size: 1.2rem;
     animation: heartBeat 2s infinite;
-    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+    flex-shrink: 0;
+}
+
+.event-content-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 .event-title-short {
-    font-size: 1.1rem;
-    margin-bottom: 8px;
+    font-size: 1rem;
+    margin: 0;
     color: var(--text-color);
     font-weight: 600;
+    line-height: 1.3;
 }
 
 .event-category-tag {
     background-color: var(--light-background);
-    padding: 3px 8px;
-    border-radius: 15px;
-    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.65rem;
     color: var(--light-text);
-    margin-bottom: 12px;
     display: inline-block;
+    width: fit-content;
 }
 
 .expand-event-btn {
     background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
     color: white;
     border: none;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.7rem;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
-    gap: 5px;
-    margin: 0 auto;
+    gap: 4px;
+    width: fit-content;
+    margin-top: 4px;
 }
 
 .expand-event-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
 }
 
 .expand-event-btn i {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
 }
 
 /* 详细内容样式 */
@@ -799,7 +813,7 @@ main {
     .timeline-event {
         width: calc(100% - 60px);
         margin-left: 60px;
-        margin-bottom: 20px;
+        margin-bottom: 15px; /* 减少移动端间距 */
     }
     
     .timeline-event.left .timeline-content::before,
@@ -823,22 +837,39 @@ main {
     }
     
     .event-thumbnail {
-        padding: 12px;
+        padding: 8px 12px;
+        gap: 10px;
+    }
+    
+    .event-date-badge {
+        min-width: 70px;
+        padding: 6px 10px;
+        font-size: 0.7rem;
     }
     
     /* 移动端照片缩略图优化 */
     .event-photo-thumbnail,
     .event-no-photo {
-        width: 60px;
-        height: 60px;
+        width: 40px;
+        height: 40px;
     }
     
     .event-no-photo {
-        font-size: 1.5rem;
+        font-size: 1rem;
     }
     
     .event-title-short {
-        font-size: 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .event-category-tag {
+        font-size: 0.6rem;
+        padding: 1px 6px;
+    }
+    
+    .expand-event-btn {
+        padding: 3px 8px;
+        font-size: 0.65rem;
     }
 }
 
@@ -1273,6 +1304,13 @@ main {
     background-color: #333;
     color: white;
     font-size: 3rem;
+    flex-direction: column;
+}
+
+.default-thumbnail p {
+    font-size: 1rem;
+    margin-top: 10px;
+    opacity: 0.7;
 }
 
 .play-button {
@@ -3190,4 +3228,31 @@ footer {
     .city-grid {
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     }
+}
+
+/* 视频预览样式 */
+.video-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+    pointer-events: none; /* 防止视频被意外播放 */
+}
+
+.video-thumbnail:hover .video-preview {
+    transform: scale(1.1);
+}
+
+/* 天气小工具头像样式 */
+.weather-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+.weather-icon-large .weather-avatar {
+    width: 60px;
+    height: 60px;
 }

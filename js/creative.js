@@ -218,12 +218,12 @@ function autoMarkExpiredWishes() {
         }
     });
     
-    // 如果有心愿被自动标记为完成，显示通知
-    if (markedCount > 0) {
-        setTimeout(() => {
-            showNotification(`${markedCount} 个过期心愿已自动标记为完成`);
-        }, 1000);
-    }
+    // 移除过期提示通知
+    // if (markedCount > 0) {
+    //     setTimeout(() => {
+    //         showNotification(`${markedCount} 个过期心愿已自动标记为完成`);
+    //     }, 1000);
+    // }
 }
 
 // 折叠/展开已完成心愿
@@ -271,8 +271,8 @@ function createWishElement(wish) {
     
     if (wish.completed) {
         if (wish.autoCompleted) {
-            daysLeftText = '已过期自动完成';
-            daysLeftClass = 'auto-completed';
+            daysLeftText = '已完成';
+            daysLeftClass = 'manually-completed';
         } else {
             daysLeftText = '已完成';
             daysLeftClass = 'manually-completed';
@@ -292,8 +292,8 @@ function createWishElement(wish) {
     
     const priorityClass = `priority-${wish.priority === '高' ? 'high' : wish.priority === '中' ? 'medium' : 'low'}`;
     
-    // 为自动完成的心愿添加特殊图标
-    const autoCompletedIcon = wish.autoCompleted ? '<i class="fas fa-clock auto-completed-icon" title="自动完成"></i>' : '';
+    // 移除自动完成的特殊图标
+    // const autoCompletedIcon = wish.autoCompleted ? '<i class="fas fa-clock auto-completed-icon" title="自动完成"></i>' : '';
     
     wishElement.innerHTML = `
         <div class="wish-header">
@@ -301,7 +301,7 @@ function createWishElement(wish) {
                 <input type="checkbox" class="wish-checkbox" ${wish.completed ? 'checked' : ''}>
                 <span class="checkmark"></span>
             </div>
-            <h3 class="wish-title">${wish.title} ${autoCompletedIcon}</h3>
+            <h3 class="wish-title">${wish.title}</h3>
             <div class="wish-priority ${priorityClass}">${wish.priority}优先级</div>
         </div>
         <div class="wish-body">

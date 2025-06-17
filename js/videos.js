@@ -4,18 +4,18 @@ const videoData = {
         {
             id: 1,
             src: "videos/WeChat_20250520142055.mp4",
-            title: "甜蜜时刻视频1",
+            title: "大头摸狗 越来越有",
             date: "2025-04-15",
             description: "记录我们一起的甜蜜时光，每一刻都值得珍藏。",
-            thumbnail: "images/微信图片_20250520142119.jpg" // 使用照片作为缩略图
+            thumbnail: null // 使用视频第一帧作为缩略图
         },
         {
             id: 2,
             src: "videos/WeChat_20250520142059.mp4",
-            title: "甜蜜时刻视频2",
+            title: "大头点菜 越点越菜",
             date: "2025-04-20",
             description: "又一个值得记忆的美好瞬间，我们的笑容如此灿烂。",
-            thumbnail: "images/微信图片_20250520142116.jpg" // 使用照片作为缩略图
+            thumbnail: null // 使用视频第一帧作为缩略图
         }
     ],
     "旅行记录": [
@@ -141,7 +141,9 @@ function createVideoElement(video, category) {
         <div class="video-thumbnail">
             ${video.thumbnail ? 
                 `<img src="${video.thumbnail}" alt="${video.title}" loading="lazy">` : 
-                `<div class="default-thumbnail"><i class="fas fa-video"></i></div>`
+                `<video class="video-preview" muted preload="metadata">
+                    <source src="${video.src}#t=0.5" type="video/mp4">
+                </video>`
             }
             <div class="play-button"><i class="fas fa-play"></i></div>
         </div>

@@ -34,8 +34,8 @@ class MessageBoard {
                     <div class="message-content"></div>
                 </div>
                 <div class="message-hint">
-                    <i class="fas fa-envelope-open-text"></i>
-                    <p>想要留言？点击下方邮箱按钮，告诉我们你的想法~</p>
+                    <i class="fab fa-tiktok"></i>
+                    <p>想要留言？点击下方抖音按钮，私信告诉我们你的想法</p>
                 </div>
             </div>
         `;

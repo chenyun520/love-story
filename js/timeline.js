@@ -16,11 +16,18 @@ const timelineEvents = [
         category: '日常生活'
     },
     {
-        date: '2025-03-30',
+        date: '2025-03-22',
         title: '相遇的第一天',
-        description: '在上海金山相遇，开始了我们的故事',
+        description: '在上海宝山相遇，开始了我们的故事',
         category: '重要时刻',
-        image: '微信图片_20250520144439.jpg'
+        image: '第一次见面.jpg'
+    },
+    {
+        date: '2025-03-20',
+        title: '加好友的第一天',
+        description: '一切都源自一次简单的自我介绍',
+        category: '重要时刻',
+        image: '加好友.jpg'
     }
 ];
 
@@ -43,9 +50,9 @@ class Timeline {
             return `
                 <div class="timeline-event ${position}" data-date="${event.date}">
                     <div class="timeline-content timeline-thumbnail" data-event-id="${event.date}">
-                        <!-- 缩略图模式 -->
+                        <!-- 缩略图模式 - 紧凑布局 -->
                         <div class="event-thumbnail">
-                            <div class="event-date-badge">${this.formatShortDate(event.date)}</div>
+                            <div class="event-date-badge">${this.formatCompactDate(event.date)}</div>
                             ${event.image ? `
                                 <div class="event-photo-thumbnail">
                                     <img src="images/${event.image}" alt="${event.title}" loading="lazy">
@@ -55,12 +62,14 @@ class Timeline {
                                     <i class="fas fa-heart"></i>
                                 </div>
                             `}
-                            <h4 class="event-title-short">${event.title}</h4>
-                            <div class="event-category-tag">${event.category}</div>
-                            <button class="expand-event-btn">
-                                <i class="fas fa-chevron-down"></i>
-                                <span>查看详情</span>
-                            </button>
+                            <div class="event-content-area">
+                                <h4 class="event-title-short">${event.title}</h4>
+                                <div class="event-category-tag">${event.category}</div>
+                                <button class="expand-event-btn">
+                                    <i class="fas fa-chevron-down"></i>
+                                    <span>详情</span>
+                                </button>
+                            </div>
                         </div>
                         
                         <!-- 详细内容（默认隐藏） -->
@@ -262,9 +271,9 @@ class Timeline {
         });
     }
 
-    formatShortDate(dateString) {
+    formatCompactDate(dateString) {
         const date = new Date(dateString);
-        return `${date.getMonth() + 1}/${date.getDate()}`;
+        return `${date.getFullYear()}年\n${date.getMonth() + 1}月${date.getDate()}日`;
     }
 
     getEventEmoji(category) {

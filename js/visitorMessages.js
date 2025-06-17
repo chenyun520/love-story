@@ -42,7 +42,7 @@ class VisitorMessages {
                     <div class="message-wrapper"></div>
                 </div>
                 <div class="messages-footer">
-                    <p>💝 想要留言？点击下方邮箱告诉我们</p>
+                    <p>💝 想要留言？点击下方抖音按钮，私信告诉我们你的想法</p>
                     <button class="email-button">
                         <i class="fas fa-envelope"></i>
                         发送留言

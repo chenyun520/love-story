@@ -14,7 +14,7 @@ const WeatherWidget = {
             { 
                 name: '天津武清', 
                 id: 'wuqing',
-                icon: '👧',
+                icon: '<img src="images/大头的猫.jpg" alt="大头的猫" class="weather-avatar">',
                 label: '大头在这里',
                 bgGradient: 'linear-gradient(135deg, #FFB6C1, #FFC0CB)'
             }
@@ -200,8 +200,8 @@ const WeatherWidget = {
             const currentCity = this.config.cities[this.config.currentCityIndex];
             
             // 更新城市信息
-            iconLarge.textContent = currentCity.icon;
-            iconSmall.textContent = currentCity.icon;
+            iconLarge.innerHTML = currentCity.icon;
+            iconSmall.innerHTML = currentCity.icon;
             cityName.textContent = `${currentCity.name} (${currentCity.label})`;
             widget.style.background = currentCity.bgGradient;
             
