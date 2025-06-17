@@ -1,0 +1,75 @@
+/* 云视频播放界面样式 */
+.cloud-video-info {
+    text-align: center;
+    padding: 20px;
+}
+
+.video-poster {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.play-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.cloud-play-btn {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.cloud-play-btn:hover {
+    background: rgba(0, 0, 0, 0.9);
+    transform: scale(1.05);
+}
+
+.cloud-play-btn i {
+    font-size: 18px;
+}
+
+.cloud-video-tips {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 20px 0;
+    text-align: left;
+}
+
+.cloud-video-tips p {
+    margin: 8px 0;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cloud-video-tips i {
+    color: #007bff;
+    width: 16px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .cloud-play-btn {
+        padding: 12px 24px;
+        font-size: 14px;
+    }
+    
+    .video-poster img {
+        max-width: 100% !important;
+    }
+} 

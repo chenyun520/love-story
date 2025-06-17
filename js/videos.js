@@ -21,11 +21,13 @@ const videoData = {
     "旅行记录": [
         {
             id: 3,
-            src: "https://share.weiyun.com/bV3ssSqm",
+            src: "https://share.weiyun.com/bV3ssSqm", // 临时使用分享链接，需要获取直播链接
             title: "舟山出游小记",
             date: "2025-06-01",
             description: "我们一起去舟山的美好回忆，海风轻抚，阳光正好，和你在一起的每一刻都是最美的风景。",
-            thumbnail: "images/舟山出游视频封面.jpg"
+            thumbnail: "images/舟山出游视频封面.jpg",
+            isCloudVideo: true, // 标记为云存储视频
+            shareUrl: "https://share.weiyun.com/bV3ssSqm" // 保存分享链接
         }
     ],
     "日常生活": []
@@ -179,32 +181,79 @@ function createVideoElement(video, category) {
 function playVideo(video) {
     const modalContainer = document.getElementById('video-modal-container');
     
-    modalContainer.innerHTML = `
-        <div class="video-modal">
-            <div class="modal-header">
-                <h3>${video.title}</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="video-player">
-                    <video controls>
-                        <source src="${video.src}" type="video/mp4">
-                        您的浏览器不支持视频播放。
-                    </video>
+    // 如果是云存储视频，显示特殊的播放界面
+    if (video.isCloudVideo) {
+        modalContainer.innerHTML = `
+            <div class="video-modal">
+                <div class="modal-header">
+                    <h3>${video.title}</h3>
+                    <button class="close-modal">&times;</button>
                 </div>
-                <div class="video-detail-info">
-                    <p class="video-date"><strong>日期：</strong>${formatDate(video.date)}</p>
-                    <p class="video-description"><strong>描述：</strong>${video.description}</p>
+                <div class="modal-body">
+                    <div class="cloud-video-info">
+                        <div class="video-poster">
+                            ${video.thumbnail ? 
+                                `<img src="${video.thumbnail}" alt="${video.title}" style="width: 100%; max-width: 600px; border-radius: 8px;">` : 
+                                `<div class="default-thumbnail"><i class="fas fa-video"></i><p>视频封面</p></div>`
+                            }
+                            <div class="play-overlay">
+                                <button class="cloud-play-btn" onclick="window.open('${video.shareUrl}', '_blank')">
+                                    <i class="fas fa-play"></i>
+                                    <span>点击观看视频</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="cloud-video-tips">
+                            <p><i class="fas fa-info-circle"></i> 此视频存储在云端，点击上方按钮在新窗口中观看</p>
+                            <p><i class="fas fa-cloud"></i> 视频通过腾讯微云提供，确保高清流畅播放</p>
+                        </div>
+                    </div>
+                    <div class="video-detail-info">
+                        <p class="video-date"><strong>日期：</strong>${formatDate(video.date)}</p>
+                        <p class="video-description"><strong>描述：</strong>${video.description}</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    `;
+        `;
+    } else {
+        // 原有的本地视频播放逻辑
+        modalContainer.innerHTML = `
+            <div class="video-modal">
+                <div class="modal-header">
+                    <h3>${video.title}</h3>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="video-player">
+                        <video controls>
+                            <source src="${video.src}" type="video/mp4">
+                            您的浏览器不支持视频播放。
+                        </video>
+                    </div>
+                    <div class="video-detail-info">
+                        <p class="video-date"><strong>日期：</strong>${formatDate(video.date)}</p>
+                        <p class="video-description"><strong>描述：</strong>${video.description}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // 自动播放本地视频
+        setTimeout(() => {
+            const videoElement = modalContainer.querySelector('video');
+            if (videoElement) {
+                videoElement.play().catch(e => {
+                    console.log('自动播放失败，可能需要用户交互：', e);
+                });
+            }
+        }, 300);
+    }
     
     modalContainer.style.display = 'flex';
     
     // 添加关闭模态框事件
     modalContainer.querySelector('.close-modal').addEventListener('click', () => {
-        // 暂停视频
+        // 暂停视频（如果是本地视频）
         const videoElement = modalContainer.querySelector('video');
         if (videoElement) {
             videoElement.pause();
@@ -215,7 +264,7 @@ function playVideo(video) {
     // 点击模态框外部关闭
     modalContainer.addEventListener('click', (e) => {
         if (e.target === modalContainer) {
-            // 暂停视频
+            // 暂停视频（如果是本地视频）
             const videoElement = modalContainer.querySelector('video');
             if (videoElement) {
                 videoElement.pause();
@@ -223,16 +272,6 @@ function playVideo(video) {
             modalContainer.style.display = 'none';
         }
     });
-    
-    // 自动播放视频
-    setTimeout(() => {
-        const videoElement = modalContainer.querySelector('video');
-        if (videoElement) {
-            videoElement.play().catch(e => {
-                console.log('自动播放失败，可能需要用户交互：', e);
-            });
-        }
-    }, 300);
 }
 
 // 显示添加视频表单
