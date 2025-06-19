@@ -35,12 +35,12 @@ const videoData = {
 
 // 初始化视频库
 function initVideoGallery() {
+    const videoTabsContainer = document.getElementById('video-tabs');
     const videoContainer = document.getElementById('video-container');
-    const videoTabs = document.getElementById('video-tabs');
     
     // 清空容器
     videoContainer.innerHTML = '';
-    videoTabs.innerHTML = '';
+    videoTabsContainer.innerHTML = '';
     
     // 创建视频分类标签
     Object.keys(videoData).forEach((category, index) => {
@@ -62,7 +62,7 @@ function initVideoGallery() {
             showVideoCategory(category);
         });
         
-        videoTabs.appendChild(tabElement);
+        videoTabsContainer.appendChild(tabElement);
     });
     
     // 添加"添加新分类"按钮
@@ -70,7 +70,7 @@ function initVideoGallery() {
     addCategoryButton.className = 'video-tab add-category';
     addCategoryButton.innerHTML = '<i class="fas fa-plus"></i> 新分类';
     addCategoryButton.addEventListener('click', showAddVideoCategoryForm);
-    videoTabs.appendChild(addCategoryButton);
+    videoTabsContainer.appendChild(addCategoryButton);
     
     // 默认显示第一个分类
     showVideoCategory(Object.keys(videoData)[0]);

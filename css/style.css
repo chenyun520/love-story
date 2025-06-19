@@ -3236,7 +3236,7 @@ footer {
     height: 100%;
     object-fit: cover;
     transition: transform 0.5s;
-    pointer-events: none; /* 防止视频被意外播放 */
+    /* pointer-events: none; 注释掉这行，让视频可以接收点击事件 */
 }
 
 .video-thumbnail:hover .video-preview {
