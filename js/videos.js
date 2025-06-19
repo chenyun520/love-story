@@ -2,6 +2,14 @@
 const videoData = {
     "甜蜜时刻": [
         {
+            id: 1,
+            src: "videos/WeChat_20250520142055.mp4",
+            title: "大头摸狗 越来越有",
+            date: "2025-04-15",
+            description: "记录我们一起的甜蜜时光，每一刻都值得珍藏。",
+            thumbnail: null // 使用视频第一帧作为缩略图
+        },
+        {
             id: 2,
             src: "videos/WeChat_20250520142059.mp4",
             title: "大头点菜 越点越菜",
@@ -13,13 +21,13 @@ const videoData = {
     "旅行记录": [
         {
             id: 3,
-            src: "https://share.weiyun.com/bV3ssSqm", // 临时使用分享链接，需要获取直播链接
+            src: "https://v.douyin.com/OrStvz-mgf0/",
             title: "舟山出游小记",
             date: "2025-06-01",
             description: "我们一起去舟山的美好回忆，海风轻抚，阳光正好，和你在一起的每一刻都是最美的风景。",
             thumbnail: "images/舟山出游视频封面.jpg",
             isCloudVideo: true, // 标记为云存储视频
-            shareUrl: "https://share.weiyun.com/bV3ssSqm" // 保存分享链接
+            shareUrl: "https://v.douyin.com/OrStvz-mgf0/" // 保存抖音分享链接
         }
     ],
     "日常生活": []
@@ -111,29 +119,13 @@ function initVideoGallery() {
     if (Object.keys(videoData).length > 0) {
         showVideoCategory(Object.keys(videoData)[0]);
     }
-    
-    // 添加"添加新视频"按钮
-    const addVideoButton = document.createElement('div');
-    addVideoButton.className = 'add-video-button';
-    addVideoButton.innerHTML = '<i class="fas fa-plus"></i> 添加新视频';
-    addVideoButton.addEventListener('click', () => {
-        // 使用新的大文件上传功能
-        if (window.videoUploader) {
-            window.videoUploader.showUploadModal();
-        } else {
-            // 降级到原来的表单（如果上传功能未加载）
-            showAddVideoForm();
-        }
-    });
-    videoContainer.appendChild(addVideoButton);
 }
 
 // 显示指定分类的视频
 async function showVideoCategory(category) {
     const videoContainer = document.getElementById('video-container');
     
-    // 清空容器（保留添加按钮）
-    const addButton = videoContainer.querySelector('.add-video-button');
+    // 清空容器
     videoContainer.innerHTML = '';
     
     // 创建视频网格
@@ -165,10 +157,20 @@ async function showVideoCategory(category) {
     
     videoContainer.appendChild(videoGrid);
     
-    // 重新添加"添加新视频"按钮
-    if (addButton) {
-        videoContainer.appendChild(addButton);
-    }
+    // 添加"添加新视频"按钮
+    const addVideoButton = document.createElement('div');
+    addVideoButton.className = 'add-video-button';
+    addVideoButton.innerHTML = '<i class="fas fa-plus"></i> 添加新视频';
+    addVideoButton.addEventListener('click', () => {
+        // 使用新的大文件上传功能
+        if (window.videoUploader) {
+            window.videoUploader.showUploadModal();
+        } else {
+            // 降级到原来的表单（如果上传功能未加载）
+            showAddVideoForm();
+        }
+    });
+    videoContainer.appendChild(addVideoButton);
 }
 
 // 创建单个视频元素
@@ -186,11 +188,17 @@ async function createVideoElement(video, category) {
     // 创建缩略图HTML
     let thumbnailHTML = '';
     if (video.isCloudVideo) {
+        // 判断是否为抖音视频
+        const isDouyinVideo = video.src.includes('douyin.com');
+        const platformName = isDouyinVideo ? '抖音' : '云存储';
+        const platformIcon = isDouyinVideo ? 'fas fa-music' : 'fas fa-cloud-download-alt';
+        const thumbnailClass = isDouyinVideo ? 'default-thumbnail douyin-video' : 'default-thumbnail';
+        
         // 云存储视频使用自定义缩略图或默认图标
         thumbnailHTML = video.thumbnail ? 
             `<img src="${video.thumbnail}" alt="${video.title}" loading="lazy" onerror="this.style.display='none'; this.parentNode.querySelector('.default-thumbnail').style.display='flex';">
-             <div class="default-thumbnail" style="display: none;"><i class="fas fa-cloud-download-alt"></i><p>云存储视频</p></div>` : 
-            `<div class="default-thumbnail"><i class="fas fa-cloud-download-alt"></i><p>云存储视频</p></div>`;
+             <div class="${thumbnailClass}" style="display: none;"><i class="${platformIcon}"></i><p>${platformName}视频</p></div>` : 
+            `<div class="${thumbnailClass}"><i class="${platformIcon}"></i><p>${platformName}视频</p></div>`;
     } else if (videoExists) {
         // 本地视频使用video标签预览
         thumbnailHTML = `
@@ -284,6 +292,11 @@ function playVideo(video) {
     
     // 如果是云存储视频，显示特殊的播放界面
     if (video.isCloudVideo) {
+        // 判断是否为抖音视频
+        const isDouyinVideo = video.src.includes('douyin.com');
+        const platformName = isDouyinVideo ? '抖音' : '腾讯微云';
+        const platformIcon = isDouyinVideo ? 'fas fa-music' : 'fas fa-cloud';
+        
         modalContainer.innerHTML = `
             <div class="video-modal">
                 <div class="modal-header">
@@ -295,18 +308,24 @@ function playVideo(video) {
                         <div class="video-poster">
                             ${video.thumbnail ? 
                                 `<img src="${video.thumbnail}" alt="${video.title}" style="width: 100%; max-width: 600px; border-radius: 8px;">` : 
-                                `<div class="default-thumbnail"><i class="fas fa-cloud-download-alt"></i><p>云存储视频</p></div>`
+                                `<div class="default-thumbnail">
+                                    <i class="${platformIcon}"></i>
+                                    <p>${platformName}视频</p>
+                                </div>`
                             }
                             <div class="play-overlay">
                                 <button class="cloud-play-btn" onclick="window.open('${video.shareUrl}', '_blank')">
                                     <i class="fas fa-external-link-alt"></i>
-                                    <span>在新窗口中观看</span>
+                                    <span>在${platformName}中观看</span>
                                 </button>
                             </div>
                         </div>
                         <div class="cloud-video-tips">
-                            <p><i class="fas fa-info-circle"></i> 此视频存储在云端，点击上方按钮在新窗口中观看</p>
-                            <p><i class="fas fa-cloud"></i> 视频通过腾讯微云提供，确保高清流畅播放</p>
+                            <p><i class="fas fa-info-circle"></i> 此视频存储在${platformName}，点击上方按钮在新窗口中观看</p>
+                            ${isDouyinVideo ? 
+                                `<p><i class="fas fa-music"></i> 抖音视频链接，支持手机端直接打开抖音APP观看</p>` :
+                                `<p><i class="fas fa-cloud"></i> 视频通过腾讯微云提供，确保高清流畅播放</p>`
+                            }
                         </div>
                     </div>
                     <div class="video-detail-info">

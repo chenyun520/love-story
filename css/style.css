@@ -1326,6 +1326,39 @@ main {
     text-align: center;
 }
 
+/* 抖音视频特殊样式 */
+.default-thumbnail.douyin-video {
+    background: linear-gradient(135deg, #ff0050 0%, #ff6b6b 100%);
+    animation: douyinGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes douyinGlow {
+    0% {
+        box-shadow: 0 0 20px rgba(255, 0, 80, 0.3);
+        background: linear-gradient(135deg, #ff0050 0%, #ff6b6b 100%);
+    }
+    100% {
+        box-shadow: 0 0 30px rgba(255, 0, 80, 0.6);
+        background: linear-gradient(135deg, #ff0050 0%, #ff4757 100%);
+    }
+}
+
+.default-thumbnail .fa-music {
+    animation: musicBounce 1.5s ease-in-out infinite;
+}
+
+@keyframes musicBounce {
+    0%, 100% { 
+        transform: scale(1) rotate(0deg); 
+    }
+    25% { 
+        transform: scale(1.1) rotate(-5deg); 
+    }
+    75% { 
+        transform: scale(1.1) rotate(5deg); 
+    }
+}
+
 .video-error {
     background: linear-gradient(135deg, #ff7b7b 0%, #d63031 100%);
 }
