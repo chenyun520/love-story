@@ -2,14 +2,6 @@
 const videoData = {
     "甜蜜时刻": [
         {
-            id: 1,
-            src: "videos/WeChat_20250520142055.mp4",
-            title: "大头摸狗 越来越有",
-            date: "2025-04-15",
-            description: "记录我们一起的甜蜜时光，每一刻都值得珍藏。",
-            thumbnail: null // 使用视频第一帧作为缩略图
-        },
-        {
             id: 2,
             src: "videos/WeChat_20250520142059.mp4",
             title: "大头点菜 越点越菜",
@@ -33,6 +25,49 @@ const videoData = {
     "日常生活": []
 };
 
+// 检查视频文件是否存在
+function checkVideoExists(src) {
+    return new Promise((resolve) => {
+        if (src.startsWith('http')) {
+            resolve(true); // 网络视频默认存在
+            return;
+        }
+        
+        const video = document.createElement('video');
+        video.onloadedmetadata = () => resolve(true);
+        video.onerror = () => resolve(false);
+        video.src = src;
+    });
+}
+
+// 生成视频缩略图
+function generateVideoThumbnail(videoSrc) {
+    return new Promise((resolve) => {
+        const video = document.createElement('video');
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        video.onloadedmetadata = () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            video.currentTime = 1; // 获取第1秒的帧
+        };
+        
+        video.onseeked = () => {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const thumbnailDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            resolve(thumbnailDataUrl);
+        };
+        
+        video.onerror = () => {
+            resolve(null);
+        };
+        
+        video.src = videoSrc;
+        video.load();
+    });
+}
+
 // 初始化视频库
 function initVideoGallery() {
     const videoTabsContainer = document.getElementById('video-tabs');
@@ -49,7 +84,7 @@ function initVideoGallery() {
         tabElement.textContent = category;
         tabElement.dataset.category = category;
         
-        tabElement.addEventListener('click', () => {
+        tabElement.addEventListener('click', async () => {
             // 移除所有标签的active类
             document.querySelectorAll('.video-tab').forEach(tab => {
                 tab.classList.remove('active');
@@ -59,7 +94,7 @@ function initVideoGallery() {
             tabElement.classList.add('active');
             
             // 显示对应分类的视频
-            showVideoCategory(category);
+            await showVideoCategory(category);
         });
         
         videoTabsContainer.appendChild(tabElement);
@@ -72,8 +107,10 @@ function initVideoGallery() {
     addCategoryButton.addEventListener('click', showAddVideoCategoryForm);
     videoTabsContainer.appendChild(addCategoryButton);
     
-    // 默认显示第一个分类
-    showVideoCategory(Object.keys(videoData)[0]);
+    // 默认显示第一个分类（异步）
+    if (Object.keys(videoData).length > 0) {
+        showVideoCategory(Object.keys(videoData)[0]);
+    }
     
     // 添加"添加新视频"按钮
     const addVideoButton = document.createElement('div');
@@ -92,7 +129,7 @@ function initVideoGallery() {
 }
 
 // 显示指定分类的视频
-function showVideoCategory(category) {
+async function showVideoCategory(category) {
     const videoContainer = document.getElementById('video-container');
     
     // 清空容器（保留添加按钮）
@@ -113,9 +150,15 @@ function showVideoCategory(category) {
         `;
         videoGrid.appendChild(emptyMessage);
     } else {
-        // 添加视频
-        videoData[category].forEach(video => {
-            const videoElement = createVideoElement(video, category);
+        // 添加视频（异步处理）
+        const videoPromises = videoData[category].map(async (video) => {
+            const videoElement = await createVideoElement(video, category);
+            return videoElement;
+        });
+        
+        // 等待所有视频元素创建完成
+        const videoElements = await Promise.all(videoPromises);
+        videoElements.forEach(videoElement => {
             videoGrid.appendChild(videoElement);
         });
     }
@@ -129,7 +172,7 @@ function showVideoCategory(category) {
 }
 
 // 创建单个视频元素
-function createVideoElement(video, category) {
+async function createVideoElement(video, category) {
     const videoElement = document.createElement('div');
     videoElement.className = 'video-item';
     videoElement.dataset.id = video.id;
@@ -137,22 +180,45 @@ function createVideoElement(video, category) {
     const videoDate = new Date(video.date);
     const formattedDate = `${videoDate.getFullYear()}年${videoDate.getMonth() + 1}月${videoDate.getDate()}日`;
     
+    // 检查视频是否存在
+    const videoExists = await checkVideoExists(video.src);
+    
+    // 创建缩略图HTML
+    let thumbnailHTML = '';
+    if (video.isCloudVideo) {
+        // 云存储视频使用自定义缩略图或默认图标
+        thumbnailHTML = video.thumbnail ? 
+            `<img src="${video.thumbnail}" alt="${video.title}" loading="lazy" onerror="this.style.display='none'; this.parentNode.querySelector('.default-thumbnail').style.display='flex';">
+             <div class="default-thumbnail" style="display: none;"><i class="fas fa-cloud-download-alt"></i><p>云存储视频</p></div>` : 
+            `<div class="default-thumbnail"><i class="fas fa-cloud-download-alt"></i><p>云存储视频</p></div>`;
+    } else if (videoExists) {
+        // 本地视频使用video标签预览
+        thumbnailHTML = `
+            <video class="video-preview" muted preload="metadata" playsinline>
+                <source src="${video.src}#t=0.5" type="video/mp4">
+            </video>
+            <div class="default-thumbnail video-fallback" style="display: none;">
+                <i class="fas fa-video"></i><p>视频预览</p>
+            </div>`;
+    } else {
+        // 视频不存在，显示错误状态
+        thumbnailHTML = `
+            <div class="default-thumbnail video-error">
+                <i class="fas fa-exclamation-triangle"></i><p>视频文件未找到</p>
+            </div>`;
+    }
+    
     videoElement.innerHTML = `
         <div class="video-thumbnail">
-            ${video.thumbnail ? 
-                `<img src="${video.thumbnail}" alt="${video.title}" loading="lazy">` : 
-                `<video class="video-preview" muted preload="metadata">
-                    <source src="${video.src}#t=0.5" type="video/mp4">
-                </video>`
-            }
+            ${thumbnailHTML}
             <div class="play-button"><i class="fas fa-play"></i></div>
         </div>
         <div class="video-info">
             <h4 class="video-title">${video.title}</h4>
             <p class="video-date">${formattedDate}</p>
             <div class="video-actions">
-                <button class="play-video" data-id="${video.id}" data-category="${category}">
-                    <i class="fas fa-play"></i> 播放
+                <button class="play-video" data-id="${video.id}" data-category="${category}" ${!videoExists && !video.isCloudVideo ? 'disabled' : ''}>
+                    <i class="fas fa-play"></i> ${video.isCloudVideo ? '在线播放' : '播放'}
                 </button>
                 <button class="edit-video" data-id="${video.id}" data-category="${category}">
                     <i class="fas fa-edit"></i> 编辑
@@ -161,20 +227,53 @@ function createVideoElement(video, category) {
         </div>
     `;
     
+    // 处理视频预览错误
+    const videoPreview = videoElement.querySelector('.video-preview');
+    if (videoPreview) {
+        videoPreview.onerror = function() {
+            this.style.display = 'none';
+            const fallback = this.parentNode.querySelector('.video-fallback');
+            if (fallback) {
+                fallback.style.display = 'flex';
+            }
+        };
+        
+        // 设置视频预览的hover效果
+        videoPreview.onmouseenter = function() {
+            if (this.paused) {
+                this.play().catch(() => {
+                    // 播放失败时静默处理
+                });
+            }
+        };
+        
+        videoPreview.onmouseleave = function() {
+            this.pause();
+            this.currentTime = 0.5;
+        };
+    }
+    
     // 添加播放视频事件
-    videoElement.querySelector('.play-video').addEventListener('click', () => {
-        playVideo(video);
-    });
+    const playButton = videoElement.querySelector('.play-video');
+    if (playButton && !playButton.disabled) {
+        playButton.addEventListener('click', () => {
+            playVideo(video);
+        });
+    }
     
     // 添加编辑视频事件
     videoElement.querySelector('.edit-video').addEventListener('click', () => {
         showEditVideoForm(video, category);
     });
     
-    // 点击缩略图也可以播放视频
-    videoElement.querySelector('.video-thumbnail').addEventListener('click', () => {
-        playVideo(video);
-    });
+    // 点击缩略图也可以播放视频（如果视频可用）
+    const thumbnail = videoElement.querySelector('.video-thumbnail');
+    if (thumbnail && (videoExists || video.isCloudVideo)) {
+        thumbnail.addEventListener('click', () => {
+            playVideo(video);
+        });
+        thumbnail.style.cursor = 'pointer';
+    }
     
     return videoElement;
 }
@@ -196,12 +295,12 @@ function playVideo(video) {
                         <div class="video-poster">
                             ${video.thumbnail ? 
                                 `<img src="${video.thumbnail}" alt="${video.title}" style="width: 100%; max-width: 600px; border-radius: 8px;">` : 
-                                `<div class="default-thumbnail"><i class="fas fa-video"></i><p>视频封面</p></div>`
+                                `<div class="default-thumbnail"><i class="fas fa-cloud-download-alt"></i><p>云存储视频</p></div>`
                             }
                             <div class="play-overlay">
                                 <button class="cloud-play-btn" onclick="window.open('${video.shareUrl}', '_blank')">
-                                    <i class="fas fa-play"></i>
-                                    <span>点击观看视频</span>
+                                    <i class="fas fa-external-link-alt"></i>
+                                    <span>在新窗口中观看</span>
                                 </button>
                             </div>
                         </div>
@@ -227,9 +326,9 @@ function playVideo(video) {
                 </div>
                 <div class="modal-body">
                     <div class="video-player">
-                        <video controls>
+                        <video controls playsinline preload="metadata">
                             <source src="${video.src}" type="video/mp4">
-                            您的浏览器不支持视频播放。
+                            <p>您的浏览器不支持视频播放。请尝试使用最新版本的Chrome、Firefox或Safari浏览器。</p>
                         </video>
                     </div>
                     <div class="video-detail-info">
@@ -240,12 +339,31 @@ function playVideo(video) {
             </div>
         `;
         
-        // 自动播放本地视频
+        // 处理视频加载错误
         setTimeout(() => {
             const videoElement = modalContainer.querySelector('video');
             if (videoElement) {
+                videoElement.onerror = function() {
+                    this.outerHTML = `
+                        <div class="video-error-message">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h4>视频加载失败</h4>
+                            <p>无法播放此视频文件，可能的原因：</p>
+                            <ul>
+                                <li>视频文件已移动或删除</li>
+                                <li>视频格式不受支持</li>
+                                <li>网络连接问题</li>
+                            </ul>
+                            <button onclick="location.reload()" class="retry-btn">
+                                <i class="fas fa-redo"></i> 重新加载页面
+                            </button>
+                        </div>
+                    `;
+                };
+                
+                // 尝试自动播放
                 videoElement.play().catch(e => {
-                    console.log('自动播放失败，可能需要用户交互：', e);
+                    console.log('自动播放失败，需要用户交互：', e);
                 });
             }
         }, 300);
@@ -267,6 +385,17 @@ function playVideo(video) {
     modalContainer.addEventListener('click', (e) => {
         if (e.target === modalContainer) {
             // 暂停视频（如果是本地视频）
+            const videoElement = modalContainer.querySelector('video');
+            if (videoElement) {
+                videoElement.pause();
+            }
+            modalContainer.style.display = 'none';
+        }
+    });
+    
+    // ESC键关闭模态框
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modalContainer.style.display === 'flex') {
             const videoElement = modalContainer.querySelector('video');
             if (videoElement) {
                 videoElement.pause();

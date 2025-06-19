@@ -1270,6 +1270,7 @@ main {
     overflow: hidden;
     box-shadow: 0 4px 10px var(--shadow-color);
     transition: transform var(--transition-speed);
+    background: white;
 }
 
 .video-item:hover {
@@ -1295,13 +1296,24 @@ main {
     opacity: 0.7;
 }
 
+.video-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.video-thumbnail:hover .video-preview {
+    transform: scale(1.05);
+}
+
 .default-thumbnail {
     width: 100%;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #333;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     font-size: 3rem;
     flex-direction: column;
@@ -1310,7 +1322,22 @@ main {
 .default-thumbnail p {
     font-size: 1rem;
     margin-top: 10px;
-    opacity: 0.7;
+    opacity: 0.8;
+    text-align: center;
+}
+
+.video-error {
+    background: linear-gradient(135deg, #ff7b7b 0%, #d63031 100%);
+}
+
+.video-error i {
+    animation: shake 1s ease-in-out infinite;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
 }
 
 .play-button {
@@ -1328,12 +1355,20 @@ main {
     color: white;
     font-size: 1.5rem;
     opacity: 0;
-    transition: opacity var(--transition-speed), background-color var(--transition-speed);
+    transition: all var(--transition-speed);
+    backdrop-filter: blur(5px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 .video-thumbnail:hover .play-button {
     opacity: 1;
-    background-color: rgba(255, 107, 107, 0.7);
+    background-color: rgba(255, 107, 107, 0.8);
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+.play-button:hover {
+    background-color: rgba(255, 107, 107, 0.9);
+    transform: translate(-50%, -50%) scale(1.2);
 }
 
 .video-info {
@@ -1343,6 +1378,7 @@ main {
 .video-title {
     margin-bottom: 5px;
     font-size: 1.1rem;
+    font-weight: 600;
 }
 
 .video-date {
@@ -1357,10 +1393,22 @@ main {
 }
 
 .video-actions button {
-    padding: 5px 10px;
-    border-radius: 4px;
+    padding: 8px 12px;
+    border-radius: 6px;
     font-size: 0.9rem;
-    transition: background-color var(--transition-speed);
+    transition: all var(--transition-speed);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.video-actions button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #ccc;
+    color: #666;
 }
 
 .play-video {
@@ -1368,17 +1416,20 @@ main {
     color: white;
 }
 
-.play-video:hover {
+.play-video:hover:not(:disabled) {
     background-color: var(--secondary-color);
+    transform: translateY(-2px);
 }
 
 .edit-video {
     background-color: var(--light-background);
     color: var(--text-color);
+    border: 1px solid var(--border-color);
 }
 
 .edit-video:hover {
     background-color: var(--border-color);
+    transform: translateY(-2px);
 }
 
 .add-video-button {
@@ -1392,15 +1443,19 @@ main {
     align-items: center;
     background-color: var(--primary-color);
     color: white;
-    padding: 10px 20px;
+    padding: 12px 24px;
     border-radius: 30px;
     font-weight: bold;
     cursor: pointer;
-    transition: background-color var(--transition-speed);
+    transition: all var(--transition-speed);
+    border: none;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
 }
 
 .add-video-button:hover {
     background-color: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
 }
 
 .add-video-button i {
@@ -1412,6 +1467,170 @@ main {
     text-align: center;
     padding: 50px 0;
     color: var(--light-text);
+}
+
+.empty-category p {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+
+/* 视频播放模态框样式 */
+.video-modal {
+    background: white;
+    border-radius: 12px;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.video-player {
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+}
+
+.video-player video {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    max-height: 70vh;
+}
+
+.video-detail-info {
+    padding: 20px;
+    background: #f8f9fa;
+}
+
+.video-detail-info p {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+/* 云存储视频样式 */
+.cloud-video-info {
+    text-align: center;
+    padding: 20px;
+}
+
+.video-poster {
+    position: relative;
+    display: inline-block;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.play-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.video-poster:hover .play-overlay {
+    opacity: 1;
+}
+
+.cloud-play-btn {
+    padding: 15px 25px;
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(238, 90, 82, 0.4);
+}
+
+.cloud-play-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(238, 90, 82, 0.5);
+}
+
+.cloud-video-tips {
+    margin-top: 20px;
+    padding: 15px;
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    border-radius: 8px;
+    border-left: 4px solid #2196f3;
+}
+
+.cloud-video-tips p {
+    margin-bottom: 8px;
+    color: #1976d2;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cloud-video-tips i {
+    color: #2196f3;
+    font-size: 1.1rem;
+}
+
+/* 视频错误信息样式 */
+.video-error-message {
+    text-align: center;
+    padding: 40px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin: 20px;
+}
+
+.video-error-message i {
+    font-size: 3rem;
+    color: #dc3545;
+    margin-bottom: 20px;
+}
+
+.video-error-message h4 {
+    color: #dc3545;
+    margin-bottom: 15px;
+}
+
+.video-error-message ul {
+    text-align: left;
+    display: inline-block;
+    margin: 15px 0;
+    color: #666;
+}
+
+.video-error-message li {
+    margin-bottom: 5px;
+}
+
+.retry-btn {
+    padding: 10px 20px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.retry-btn:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-1px);
 }
 
 /* 创意模块样式 */
