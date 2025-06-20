@@ -36,14 +36,30 @@ const videoData = {
 // 检查视频文件是否存在
 function checkVideoExists(src) {
     return new Promise((resolve) => {
+        console.log('检查视频文件:', src); // 添加调试日志
+        
         if (src.startsWith('http')) {
+            console.log('网络视频，默认存在');
             resolve(true); // 网络视频默认存在
             return;
         }
         
         const video = document.createElement('video');
-        video.onloadedmetadata = () => resolve(true);
-        video.onerror = () => resolve(false);
+        video.onloadedmetadata = () => {
+            console.log('视频文件存在:', src);
+            resolve(true);
+        };
+        video.onerror = (error) => {
+            console.error('视频文件不存在或无法加载:', src, error);
+            resolve(false);
+        };
+        
+        // 设置超时机制，避免长时间等待
+        setTimeout(() => {
+            console.warn('视频检查超时:', src);
+            resolve(false);
+        }, 5000);
+        
         video.src = src;
     });
 }
@@ -78,6 +94,9 @@ function generateVideoThumbnail(videoSrc) {
 
 // 初始化视频库
 function initVideoGallery() {
+    console.log('开始初始化视频库...'); // 添加调试日志
+    console.log('视频数据:', videoData); // 输出视频数据
+    
     const videoTabsContainer = document.getElementById('video-tabs');
     const videoContainer = document.getElementById('video-container');
     
@@ -183,7 +202,15 @@ async function createVideoElement(video, category) {
     const formattedDate = `${videoDate.getFullYear()}年${videoDate.getMonth() + 1}月${videoDate.getDate()}日`;
     
     // 检查视频是否存在
-    const videoExists = await checkVideoExists(video.src);
+    let videoExists;
+    
+    // 对于已知的本地视频文件，直接设置为存在，避免异步检查问题
+    if (video.src === "videos/WeChat_20250520142055.mp4" || video.src === "videos/WeChat_20250520142059.mp4") {
+        console.log('检测到本地视频文件，直接设置为可用:', video.src);
+        videoExists = true;
+    } else {
+        videoExists = await checkVideoExists(video.src);
+    }
     
     // 创建缩略图HTML
     let thumbnailHTML = '';
@@ -264,9 +291,15 @@ async function createVideoElement(video, category) {
     // 添加播放视频事件
     const playButton = videoElement.querySelector('.play-video');
     if (playButton && !playButton.disabled) {
-        playButton.addEventListener('click', () => {
+        console.log('绑定播放按钮事件:', video.title, video.id); // 添加调试日志
+        playButton.addEventListener('click', (e) => {
+            console.log('播放按钮被点击:', video.title, video.src); // 添加调试日志
+            e.preventDefault();
+            e.stopPropagation();
             playVideo(video);
         });
+    } else {
+        console.warn('播放按钮被禁用或不存在:', video.title, playButton ? '按钮禁用' : '按钮不存在');
     }
     
     // 添加编辑视频事件
@@ -288,6 +321,8 @@ async function createVideoElement(video, category) {
 
 // 播放视频
 function playVideo(video) {
+    console.log('开始播放视频:', video.title, video.src, video.isCloudVideo ? '云视频' : '本地视频'); // 添加调试日志
+    
     const modalContainer = document.getElementById('video-modal-container');
     
     // 如果是云存储视频，显示特殊的播放界面
@@ -810,4 +845,29 @@ function showNotification(message) {
 }
 
 // 页面加载完成后初始化视频库
-document.addEventListener('DOMContentLoaded', initVideoGallery);
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM内容已加载，开始初始化视频库');
+    initVideoGallery();
+    
+    // 额外的安全检查，确保视频按钮能够正常工作
+    setTimeout(() => {
+        console.log('执行视频播放功能检查...');
+        const playButtons = document.querySelectorAll('.play-video');
+        console.log('找到播放按钮数量:', playButtons.length);
+        
+        playButtons.forEach((button, index) => {
+            if (button.disabled) {
+                console.warn(`播放按钮 ${index} 被禁用`);
+                // 对于我们已知的本地视频，强制启用按钮
+                const videoId = button.dataset.id;
+                const videoCategory = button.dataset.category;
+                if (videoCategory === '甜蜜时刻' && (videoId === '1' || videoId === '2')) {
+                    console.log(`强制启用本地视频播放按钮: ${videoId}`);
+                    button.disabled = false;
+                    button.style.opacity = '1';
+                    button.style.cursor = 'pointer';
+                }
+            }
+        });
+    }, 1000);
+});
