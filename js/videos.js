@@ -45,22 +45,51 @@ function checkVideoExists(src) {
         }
         
         const video = document.createElement('video');
+        let resolved = false;
+        
         video.onloadedmetadata = () => {
-            console.log('视频文件存在:', src);
-            resolve(true);
+            if (!resolved) {
+                console.log('视频文件存在:', src);
+                resolved = true;
+                resolve(true);
+            }
         };
+        
+        video.oncanplay = () => {
+            if (!resolved) {
+                console.log('视频可以播放:', src);
+                resolved = true;
+                resolve(true);
+            }
+        };
+        
         video.onerror = (error) => {
-            console.error('视频文件不存在或无法加载:', src, error);
-            resolve(false);
+            if (!resolved) {
+                console.error('视频文件不存在或无法加载:', src, error);
+                resolved = true;
+                resolve(false);
+            }
         };
         
-        // 设置超时机制，避免长时间等待
+        // 增加超时时间到15秒，并添加更多信息
         setTimeout(() => {
-            console.warn('视频检查超时:', src);
-            resolve(false);
-        }, 5000);
+            if (!resolved) {
+                console.warn('视频检查超时:', src, '- 可能文件较大或网络较慢');
+                resolved = true;
+                resolve(true); // 超时时假设存在，让用户尝试播放
+            }
+        }, 15000);
         
-        video.src = src;
+        try {
+            video.src = src;
+            video.load();
+        } catch (error) {
+            console.error('设置视频源失败:', src, error);
+            if (!resolved) {
+                resolved = true;
+                resolve(false);
+            }
+        }
     });
 }
 
