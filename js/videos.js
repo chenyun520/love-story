@@ -202,15 +202,7 @@ async function createVideoElement(video, category) {
     const formattedDate = `${videoDate.getFullYear()}年${videoDate.getMonth() + 1}月${videoDate.getDate()}日`;
     
     // 检查视频是否存在
-    let videoExists;
-    
-    // 对于已知的本地视频文件，直接设置为存在，避免异步检查问题
-    if (video.src === "videos/WeChat_20250520142055.mp4" || video.src === "videos/WeChat_20250520142059.mp4") {
-        console.log('检测到本地视频文件，直接设置为可用:', video.src);
-        videoExists = true;
-    } else {
-        videoExists = await checkVideoExists(video.src);
-    }
+    let videoExists = await checkVideoExists(video.src);
     
     // 创建缩略图HTML
     let thumbnailHTML = '';
@@ -848,26 +840,4 @@ function showNotification(message) {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM内容已加载，开始初始化视频库');
     initVideoGallery();
-    
-    // 额外的安全检查，确保视频按钮能够正常工作
-    setTimeout(() => {
-        console.log('执行视频播放功能检查...');
-        const playButtons = document.querySelectorAll('.play-video');
-        console.log('找到播放按钮数量:', playButtons.length);
-        
-        playButtons.forEach((button, index) => {
-            if (button.disabled) {
-                console.warn(`播放按钮 ${index} 被禁用`);
-                // 对于我们已知的本地视频，强制启用按钮
-                const videoId = button.dataset.id;
-                const videoCategory = button.dataset.category;
-                if (videoCategory === '甜蜜时刻' && (videoId === '1' || videoId === '2')) {
-                    console.log(`强制启用本地视频播放按钮: ${videoId}`);
-                    button.disabled = false;
-                    button.style.opacity = '1';
-                    button.style.cursor = 'pointer';
-                }
-            }
-        });
-    }, 1000);
 });
