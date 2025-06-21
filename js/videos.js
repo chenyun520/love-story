@@ -56,9 +56,9 @@ function checkVideoExists(src) {
         
         // 设置超时机制，避免长时间等待
         setTimeout(() => {
-            console.warn('视频检查超时:', src);
+            console.warn('视频检查超时（已延长至15秒）:', src);
             resolve(false);
-        }, 5000);
+        }, 15000); // 超时时间从5秒增加到15秒
         
         video.src = src;
     });
