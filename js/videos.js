@@ -71,14 +71,14 @@ function checkVideoExists(src) {
             }
         };
         
-        // 增加超时时间到15秒，并添加更多信息
+        // 缩短超时时间到3秒，快速检测
         setTimeout(() => {
             if (!resolved) {
-                console.warn('视频检查超时:', src, '- 可能文件较大或网络较慢');
+                console.warn('视频检查超时:', src, '- 可能是GitHub Pages无法提供视频文件');
                 resolved = true;
-                resolve(true); // 超时时假设存在，让用户尝试播放
+                resolve(false); // 超时时返回false，显示错误提示
             }
-        }, 15000);
+        }, 3000);
         
         try {
             video.src = src;
@@ -257,10 +257,12 @@ async function createVideoElement(video, category) {
                 <i class="fas fa-video"></i><p>视频预览</p>
             </div>`;
     } else {
-        // 视频不存在，显示错误状态
+        // 视频不存在，显示GitHub Pages相关的错误状态
         thumbnailHTML = `
             <div class="default-thumbnail video-error">
-                <i class="fas fa-exclamation-triangle"></i><p>视频文件未找到</p>
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>GitHub Pages无法加载视频</p>
+                <small>点击播放按钮查看详情</small>
             </div>`;
     }
     
@@ -422,16 +424,34 @@ function playVideo(video) {
                     this.outerHTML = `
                         <div class="video-error-message">
                             <i class="fas fa-exclamation-triangle"></i>
-                            <h4>视频加载失败</h4>
-                            <p>无法播放此视频文件，可能的原因：</p>
-                            <ul>
-                                <li>视频文件已移动或删除</li>
-                                <li>视频格式不受支持</li>
-                                <li>网络连接问题</li>
-                            </ul>
-                            <button onclick="location.reload()" class="retry-btn">
-                                <i class="fas fa-redo"></i> 重新加载页面
-                            </button>
+                            <h4>GitHub Pages 视频播放限制</h4>
+                            <p>由于 GitHub Pages 的静态托管限制，视频文件无法直接播放。</p>
+                            <div class="error-details">
+                                <h5>可能的原因：</h5>
+                                <ul>
+                                    <li>GitHub Pages 不支持大文件的直接访问</li>
+                                    <li>Git LFS 文件在静态部署中无法正确解析</li>
+                                    <li>视频文件超过了 GitHub Pages 的文件大小限制</li>
+                                </ul>
+                                
+                                <h5>解决方案：</h5>
+                                <div class="solution-buttons">
+                                    <a href="https://github.com/chenyun520/love-story/raw/main/${video.src}" 
+                                       target="_blank" 
+                                       class="download-btn">
+                                        <i class="fas fa-download"></i> 下载视频
+                                    </a>
+                                    <button onclick="navigator.clipboard.writeText('${video.description}')" 
+                                            class="copy-btn">
+                                        <i class="fas fa-copy"></i> 复制描述
+                                    </button>
+                                </div>
+                                
+                                <p class="solution-note">
+                                    <i class="fas fa-info-circle"></i> 
+                                    您可以点击"下载视频"直接下载文件到本地观看
+                                </p>
+                            </div>
                         </div>
                     `;
                 };

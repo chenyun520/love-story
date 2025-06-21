@@ -3508,3 +3508,129 @@ footer {
     width: 60px;
     height: 60px;
 }
+
+/* 视频错误提示样式 */
+.video-error-message {
+    text-align: center;
+    padding: 30px 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    border: 2px dashed #dee2e6;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.video-error-message h4 {
+    color: #dc3545;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+.video-error-message p {
+    color: #6c757d;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.error-details {
+    text-align: left;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.error-details h5 {
+    color: #495057;
+    margin: 15px 0 10px 0;
+    font-size: 1.1em;
+}
+
+.error-details ul {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.error-details li {
+    margin: 8px 0;
+    color: #6c757d;
+}
+
+.solution-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.download-btn, .copy-btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.download-btn {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+}
+
+.download-btn:hover {
+    background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.copy-btn {
+    background: linear-gradient(135deg, #007bff 0%, #6f42c1 100%);
+    color: white;
+}
+
+.copy-btn:hover {
+    background: linear-gradient(135deg, #0056b3 0%, #5a2d8c 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.solution-note {
+    background: #e3f2fd;
+    padding: 12px;
+    border-radius: 6px;
+    border-left: 4px solid #2196f3;
+    color: #1565c0;
+    font-size: 0.9em;
+    margin-top: 15px;
+}
+
+.solution-note i {
+    color: #2196f3;
+    margin-right: 8px;
+}
+
+/* 视频错误缩略图样式优化 */
+.default-thumbnail.video-error {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border: 2px dashed #ffc107;
+    color: #856404;
+}
+
+.default-thumbnail.video-error i {
+    color: #ff6b35;
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.default-thumbnail.video-error small {
+    font-size: 0.8em;
+    opacity: 0.8;
+    margin-top: 5px;
+    display: block;
+}
