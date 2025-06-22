@@ -3,7 +3,7 @@ const videoData = {
     "甜蜜时刻": [
         {
             id: 1,
-            src: "videos/WeChat_20250520142055.mp4",
+            src: "videos/大头摸狗.mp4",
             title: "大头摸狗 越来越有",
             date: "2025-04-15",
             description: "记录我们一起的甜蜜时光，每一刻都值得珍藏。",
@@ -11,7 +11,7 @@ const videoData = {
         },
         {
             id: 2,
-            src: "videos/WeChat_20250520142059.mp4",
+            src: "videos/大头点菜.mp4",
             title: "大头点菜 越点越菜",
             date: "2025-04-20",
             description: "又一个值得记忆的美好瞬间，我们的笑容如此灿烂。",
