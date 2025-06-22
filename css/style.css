@@ -1360,11 +1360,28 @@ main {
 }
 
 .video-error {
-    background: linear-gradient(135deg, #ff7b7b 0%, #d63031 100%);
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 1px solid #dee2e6;
+    color: #6c757d;
+    position: relative;
+    overflow: hidden;
+}
+
+.video-error::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ff9a8b, #fecfef, #fecfef);
+    opacity: 0.6;
 }
 
 .video-error i {
-    animation: shake 1s ease-in-out infinite;
+    font-size: 2rem;
+    color: #adb5bd;
+    margin-bottom: 0.5rem;
 }
 
 @keyframes shake {
@@ -3617,20 +3634,54 @@ footer {
 
 /* 视频错误缩略图样式优化 */
 .default-thumbnail.video-error {
-    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-    border: 2px dashed #ffc107;
-    color: #856404;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 1px solid #dee2e6;
+    color: #6c757d;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.default-thumbnail.video-error::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ff9a8b, #fecfef, #fecfef);
+    opacity: 0.6;
+}
+
+.default-thumbnail.video-error:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    border-color: #adb5bd;
 }
 
 .default-thumbnail.video-error i {
-    color: #ff6b35;
-    font-size: 2em;
-    margin-bottom: 10px;
+    font-size: 2.5rem;
+    color: #adb5bd;
+    margin-bottom: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.default-thumbnail.video-error:hover i {
+    color: #868e96;
 }
 
 .default-thumbnail.video-error small {
-    font-size: 0.8em;
-    opacity: 0.8;
-    margin-top: 5px;
-    display: block;
+    color: #868e96;
+    font-size: 0.85rem;
+    font-weight: 500;
+    line-height: 1.4;
+    opacity: 0.9;
+}
+
+.default-thumbnail.video-error p {
+    color: #6c757d;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.3px;
 }
