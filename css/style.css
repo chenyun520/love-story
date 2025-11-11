@@ -21,6 +21,8 @@ body{
     color:var(--ink);
     background:linear-gradient(180deg,#f9fdff 0%,#f1f7ff 100%);
     min-height:100vh;
+    user-select:none;
+    -webkit-user-select:none;
 }
 .game-app{position:relative}
 .game-app::before{
@@ -781,12 +783,19 @@ body{
     margin-top:14px;background:var(--tray);border:2px solid #dfeaff;border-radius:18px;padding:14px;
     position:relative;min-height:48vh;box-shadow:var(--shadow-sm);overflow:auto;scroll-behavior:smooth
 }
+.tools-tray, .game {
+    user-select:none;
+    -webkit-user-select:none;
+}
 .pan-hints{position:absolute;inset:8px auto auto 8px;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.8);border:1px solid #e6eaf2;border-radius:10px;padding:4px 8px;z-index:2}
 .pan-hints .arrow{opacity:.7;animation:blink 1.6s infinite}
 .pan-hints .hint-text{font-size:.85rem;color:#55607a}
 .tool{
     width:110px;height:110px;border-radius:14px;background:#fff;border:2px solid #e7ecf6;display:flex;align-items:center;justify-content:center;
     cursor:grab;touch-action:none;position:relative;transition:transform .15s var(--ease),box-shadow .15s var(--ease);
+    user-select:none;
+    -webkit-user-select:none;
+    -webkit-user-drag:none;
 }
 .tool:active{cursor:grabbing}
 .tool.dragging{transform:scale(1.05);box-shadow:var(--shadow-md);z-index:10}

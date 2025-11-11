@@ -282,6 +282,11 @@
         let startX = 0, startY = 0, originX = 0, originY = 0, dragging = false;
 
         const onDown = (e) => {
+            // 仅响应主键指针，避免右键等导致异常
+            if (e.button !== undefined && e.button !== 0) return;
+            // 阻止滚动/文本选中/点击冒泡造成的误触
+            e.preventDefault();
+            e.stopPropagation();
             const p = getPoint(e);
             dragging = true;
             el.classList.add('dragging');
@@ -295,20 +300,27 @@
             el.style.top = originY + 'px';
             el.style.pointerEvents = 'none';
             document.body.appendChild(el);
-            window.addEventListener('pointermove', onMove);
+            // 捕获指针，确保移出窗口或越界也能收到事件
+            try { if (e.pointerId != null && el.setPointerCapture) el.setPointerCapture(e.pointerId); } catch(_){}
+            window.addEventListener('pointermove', onMove, { passive: false });
             window.addEventListener('pointerup', onUp, { once: true });
+            window.addEventListener('pointercancel', onUp, { once: true });
         };
         const onMove = (e) => {
             if (!dragging) return;
+            // 阻止页面滚动
+            if (e.cancelable) e.preventDefault();
             const p = getPoint(e);
             el.style.left = (p.x - startX) + 'px';
             el.style.top = (p.y - startY) + 'px';
         };
-        const onUp = () => {
+        const onUp = (e) => {
             dragging = false;
             el.classList.remove('dragging');
             el.style.pointerEvents = '';
             window.removeEventListener('pointermove', onMove);
+            // 释放捕获
+            try { if (e && e.pointerId != null && el.releasePointerCapture) el.releasePointerCapture(e.pointerId); } catch(_){}
 
             const dropOk = tryDrop(el);
             if (!dropOk) {
@@ -322,6 +334,7 @@
                 el.style.position = 'absolute';
                 el.style.left = Math.max(0, Math.min(relLeft, trayEl.scrollWidth - elRect.width)) + 'px';
                 el.style.top = Math.max(0, Math.min(relTop, trayEl.scrollHeight - elRect.height)) + 'px';
+                toggleCabinetOpen(false);
             }
         };
         el.addEventListener('pointerdown', onDown);
