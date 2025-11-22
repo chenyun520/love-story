@@ -36,6 +36,7 @@
                     <div class="hero-actions">
                         <button id="btnStart" class="btn btn-primary btn-large">开始游戏</button>
                         <button id="btnHow" class="btn btn-ghost btn-large">怎么玩？</button>
+                        <button id="btnLogin" class="btn btn-ghost btn-large">登录/注册</button>
                     </div>
                 </div>
             </div>
@@ -263,8 +264,65 @@
                 </div>
             </div>
         </div>
+
+        <!-- 登录/注册弹窗 -->
+        <div id="authModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+            <div class="modal-content auth-modal-content">
+                <div class="auth-header">
+                    <h3 id="authTitle">登录</h3>
+                    <p class="auth-subtitle" id="authSubtitle">登录以保存和读取你的游戏进度</p>
+                </div>
+                
+                <!-- 登录表单 -->
+                <form id="loginForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="loginUsername">用户名</label>
+                        <input type="text" id="loginUsername" placeholder="请输入用户名" required autocomplete="username">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">密码</label>
+                        <input type="password" id="loginPassword" placeholder="请输入密码" required autocomplete="current-password">
+                    </div>
+                    <div class="form-error" id="loginError"></div>
+                    <div class="modal-actions">
+                        <button type="submit" class="btn btn-primary btn-large">登录</button>
+                        <button type="button" id="switchToRegister" class="btn btn-ghost">还没有账号？注册</button>
+                    </div>
+                </form>
+
+                <!-- 注册表单 -->
+                <form id="registerForm" class="auth-form" style="display: none;">
+                    <div class="form-group">
+                        <label for="registerUsername">用户名</label>
+                        <input type="text" id="registerUsername" placeholder="请输入用户名（3-20个字符）" required autocomplete="username" minlength="3" maxlength="20">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">密码</label>
+                        <input type="password" id="registerPassword" placeholder="请输入密码（至少6个字符）" required autocomplete="new-password" minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPasswordConfirm">确认密码</label>
+                        <input type="password" id="registerPasswordConfirm" placeholder="请再次输入密码" required autocomplete="new-password" minlength="6">
+                    </div>
+                    <div class="form-error" id="registerError"></div>
+                    <div class="modal-actions">
+                        <button type="submit" class="btn btn-primary btn-large">注册</button>
+                        <button type="button" id="switchToLogin" class="btn btn-ghost">已有账号？登录</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 用户信息显示 -->
+        <div id="userInfo" class="user-info" style="display: none;">
+            <div class="user-info-content">
+                <span class="user-name" id="userNameDisplay"></span>
+                <button id="btnLogout" class="btn btn-ghost small">退出登录</button>
+            </div>
+        </div>
     </div>
 
+    <script src="js/auth.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>
