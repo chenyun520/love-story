@@ -1,0 +1,229 @@
+
+/* 季节主题特效容器 */
+#season-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+}
+
+/* 季节切换按钮 */
+#season-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+}
+
+#season-toggle:hover {
+    transform: rotate(90deg) scale(1.1);
+}
+
+/* 夏季气泡 */
+.summer-bubble {
+    position: absolute;
+    bottom: -20px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    animation: rise 5s infinite ease-in;
+}
+
+@keyframes rise {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.6;
+    }
+    100% {
+        transform: translateY(-100vh) scale(1.5);
+        opacity: 0;
+    }
+}
+
+/* 春季花瓣 (SVG background handled in JS or CSS shapes) */
+.spring-petal {
+    position: absolute;
+    top: -20px;
+    width: 15px;
+    height: 15px;
+    background: #ffb7b2;
+    border-radius: 15px 0 15px 0;
+    opacity: 0.8;
+    animation: fall-rotate 8s infinite linear;
+}
+
+@keyframes fall-rotate {
+    0% {
+        transform: translateY(0) rotate(0deg) translateX(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(100vh) rotate(360deg) translateX(50px);
+        opacity: 0;
+    }
+}
+
+/* 秋季落叶 */
+.autumn-leaf {
+    position: absolute;
+    top: -20px;
+    width: 20px;
+    height: 20px;
+    background: #e67e22; /* Fallback */
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    animation: fall-sway 6s infinite ease-in-out;
+}
+
+@keyframes fall-sway {
+    0% { transform: translateY(0) rotate(0deg) translateX(-20px); opacity: 0; }
+    10% { opacity: 1; }
+    100% { transform: translateY(100vh) rotate(180deg) translateX(20px); opacity: 0; }
+}
+
+/* 冬季雪花 */
+.winter-snow {
+    position: absolute;
+    top: -10px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: snow-fall 10s infinite linear;
+    filter: blur(1px);
+}
+
+@keyframes snow-fall {
+    0% { transform: translateY(0); opacity: 0; }
+    10% { opacity: 1; }
+    100% { transform: translateY(100vh); opacity: 0; }
+}
+
+/* Login/Gallery Styles */
+.login-gallery-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.gallery-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+}
+
+.gallery-slide.active {
+    opacity: 1;
+}
+
+.login-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 0;
+}
+
+/* Magazine Cover Styles */
+.magazine-cover {
+    width: 100%;
+    min-height: 100vh;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+    color: white;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.magazine-header {
+    text-align: center;
+    font-family: 'Didot', 'Times New Roman', serif;
+}
+
+.magazine-title {
+    font-size: 4rem;
+    font-weight: bold;
+    letter-spacing: 5px;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.magazine-subtitle {
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    margin-top: 10px;
+    border-top: 1px solid white;
+    border-bottom: 1px solid white;
+    display: inline-block;
+    padding: 5px 20px;
+}
+
+.magazine-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 15px;
+    padding-bottom: 40px;
+    padding-right: 20px;
+}
+
+.menu-item {
+    font-size: 1.5rem;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    background: rgba(255,255,255,0.2);
+    padding: 10px 20px;
+    backdrop-filter: blur(5px);
+    border-radius: 5px;
+    transition: all 0.3s;
+    text-align: right;
+    width: fit-content;
+}
+
+.menu-item:hover {
+    background: rgba(255,255,255,0.4);
+    transform: translateX(-10px);
+}
+
+.menu-item small {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: normal;
+    opacity: 0.8;
+}
