@@ -4,257 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>恋爱漫画 - Love Story</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Didot:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/magazine.css">
-    <style>
-        body {
-            background-color: #f0f2f5;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
-            font-family: 'Noto Sans SC', sans-serif;
-        }
-
-        .header-nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(255,255,255,0.9);
-            backdrop-filter: blur(10px);
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-
-        .book-container {
-            margin-top: 80px;
-            perspective: 2000px;
-            width: 90vw;
-            max-width: 1000px;
-            height: 70vh;
-            max-height: 800px;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* Simplified Book: Just a stack of cards that slide/fade for better mobile compatibility */
-        .card-stack {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-
-        .story-card {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: white;
-            border-radius: 8px; /* Comic book style */
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            border: 1px solid #ddd;
-            display: flex;
-            flex-direction: column;
-            padding: 30px;
-            transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-            transform-origin: bottom center;
-            overflow-y: auto;
-        }
-
-        /* Comic Panel Styling */
-        .comic-date {
-            font-family: 'Didot', serif;
-            font-size: 1.5rem;
-            font-weight: bold;
-            border-bottom: 3px solid var(--accent-purple);
-            padding-bottom: 5px;
-            margin-bottom: 20px;
-            color: var(--text-main);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .comic-title {
-            font-size:0.8em;
-            font-weight:normal;
-            margin-left:10px;
-            color: #666;
-        }
-
-        .dialogue-row {
-            display: flex;
-            margin-bottom: 25px;
-            align-items: flex-start;
-            position: relative;
-        }
-
-        .dialogue-row.shepherd {
-            flex-direction: row-reverse;
-        }
-
-        .avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: #eee;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.2rem;
-            color: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            border: 2px solid white;
-        }
-
-        .avatar.shepherd-avi { background: var(--accent-purple); }
-        .avatar.sheep-avi { background: var(--accent-pink); }
-
-        .bubble {
-            max-width: 75%;
-            padding: 15px 20px;
-            border-radius: 20px;
-            font-size: 1rem;
-            line-height: 1.6;
-            position: relative;
-            margin: 0 15px;
-            box-shadow: 2px 2px 0px rgba(0,0,0,0.05);
-            border: 2px solid;
-        }
-
-        .bubble.shepherd-bubble {
-            background: #f8f0ff;
-            color: #4a148c;
-            border-color: #e1bee7;
-            border-top-right-radius: 0;
-        }
-
-        .bubble.sheep-bubble {
-            background: #fff0f5;
-            color: #880e4f;
-            border-color: #f8bbd0;
-            border-top-left-radius: 0;
-        }
-
-        /* Comic/Sketch Effect for Images */
-        .comic-image {
-            width: 100%;
-            max-height: 350px;
-            object-fit: cover;
-            border: 8px solid white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            transform: rotate(-1deg);
-            margin: 15px 0 25px 0;
-            border-radius: 2px;
-            /* Sketchy Filter */
-            filter: contrast(1.1) brightness(1.05);
-        }
-
-        .sketch-decor {
-            position: absolute;
-            font-size: 1.5rem;
-            opacity: 0.8;
-            pointer-events: none;
-        }
-
-        /* Controls */
-        .controls {
-            position: fixed;
-            bottom: 20px;
-            display: flex;
-            gap: 20px;
-            z-index: 100;
-        }
-
-        .control-btn {
-            background: white;
-            color: var(--text-main);
-            border: 2px solid var(--text-main);
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            font-size: 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            transition: all 0.2s;
-        }
-
-        .control-btn:active { transform: scale(0.9); }
-
-        /* Animation Classes */
-        .card-active {
-            transform: translateY(0) scale(1);
-            opacity: 1;
-            z-index: 10;
-        }
-
-        .card-next {
-            transform: translateY(20px) scale(0.95);
-            opacity: 0.8;
-            z-index: 5;
-            pointer-events: none;
-        }
-
-        .card-prev {
-            transform: translateY(-120%) rotate(-5deg); /* Fly up and away */
-            opacity: 0;
-            z-index: 15;
-            pointer-events: none;
-        }
-
-        .page-num {
-            position: absolute;
-            bottom: 15px;
-            right: 20px;
-            color: #ccc;
-            font-size: 0.9rem;
-        }
-
-        @media(min-width: 800px) {
-            .story-card {
-                padding: 50px;
-            }
-        }
-    </style>
 </head>
 <body>
 
     <script src="js/seasons.js"></script>
 
-    <nav class="header-nav">
+    <!-- Header -->
+    <nav class="header-nav" style="position:fixed; top:0; left:0; width:100%; padding:15px; z-index:200; display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.8); backdrop-filter:blur(10px);">
         <a href="index.html" class="btn btn-ghost" style="padding: 5px 15px; font-size: 0.9rem;">
             ← 目录
         </a>
-        <div style="font-weight: bold; color: var(--text-main);">LOVELOG</div>
-        <div style="width: 60px;"></div> <!-- Spacer -->
+        <div style="font-weight: bold; color: var(--text-main); letter-spacing: 2px;">LOVELOG</div>
+        <div style="width: 60px;"></div>
     </nav>
 
-    <div class="book-container">
-        <div class="card-stack" id="cardStack">
-            <!-- Cards injected via JS -->
-        </div>
-    </div>
+    <!-- Book Container -->
+    <div id="bookContainer" style="width:100%; height:100vh; overflow:hidden;"></div>
 
-    <div class="controls">
-        <div class="control-btn" id="prevBtn">↑</div>
-        <div class="control-btn" id="nextBtn">↓</div>
-    </div>
-
+    <script src="js/book.js"></script>
     <script>
+        // Story Data (Copied and cleaned from original)
         const storyData = [
             {
                 date: "2025.09.22",
@@ -394,107 +165,8 @@
             }
         ];
 
-        const stack = document.getElementById('cardStack');
-        let currentIndex = 0;
-
-        function renderCards() {
-            storyData.forEach((data, index) => {
-                const card = document.createElement('div');
-                card.className = 'story-card';
-
-                let html = `
-                    <div class="comic-date">
-                        ${data.date}
-                        <span class="comic-title">${data.title}</span>
-                    </div>
-                `;
-
-                data.content.forEach(item => {
-                    if (item.type === 'image') {
-                        html += `
-                            <div style="position:relative;">
-                                <img src="${item.src}" class="comic-image" loading="lazy" onerror="this.src='image/gallery_02.jpg'">
-                                <div class="sketch-decor" style="bottom:-10px; right:-10px;">✨</div>
-                            </div>
-                        `;
-                    } else {
-                        const isShepherd = item.type === 'shepherd';
-                        const avatarChar = isShepherd ? '☁️' : '🐑';
-                        const avatarClass = isShepherd ? 'shepherd-avi' : 'sheep-avi';
-                        const bubbleClass = isShepherd ? 'shepherd-bubble' : 'sheep-bubble';
-                        const rowClass = isShepherd ? 'shepherd' : '';
-
-                        // Add some random "sketch" icons
-                        const decor = Math.random() > 0.7 ? (isShepherd ? '🎵' : '💢') : '';
-                        const decorStyle = isShepherd ? 'left:-10px; top:-10px;' : 'right:-10px; top:-10px;';
-
-                        html += `
-                            <div class="dialogue-row ${rowClass}">
-                                <div class="avatar ${avatarClass}">${avatarChar}</div>
-                                <div class="bubble ${bubbleClass}">
-                                    ${item.text.replace(/\n/g, '<br>')}
-                                    ${decor ? `<div class="sketch-decor" style="position:absolute; ${decorStyle}">${decor}</div>` : ''}
-                                </div>
-                            </div>
-                        `;
-                    }
-                });
-
-                html += `<div class="page-num">${index + 1} / ${storyData.length}</div>`;
-                card.innerHTML = html;
-                stack.appendChild(card);
-            });
-            updateClasses();
-        }
-
-        function updateClasses() {
-            const cards = document.querySelectorAll('.story-card');
-            cards.forEach((card, i) => {
-                card.className = 'story-card'; // Reset
-                if (i === currentIndex) {
-                    card.classList.add('card-active');
-                } else if (i === currentIndex + 1) {
-                    card.classList.add('card-next');
-                } else if (i < currentIndex) {
-                    card.classList.add('card-prev');
-                } else {
-                    card.style.opacity = '0';
-                    card.style.zIndex = '0';
-                    card.style.transform = 'translateY(50px) scale(0.9)';
-                }
-            });
-        }
-
-        document.getElementById('nextBtn').addEventListener('click', () => {
-            if (currentIndex < storyData.length - 1) {
-                currentIndex++;
-                updateClasses();
-            }
-        });
-
-        document.getElementById('prevBtn').addEventListener('click', () => {
-            if (currentIndex > 0) {
-                currentIndex--;
-                updateClasses();
-            }
-        });
-
-        renderCards();
-
-        // Keyboard support
-        document.addEventListener('keydown', (e) => {
-            if(e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-                if (currentIndex < storyData.length - 1) {
-                    currentIndex++;
-                    updateClasses();
-                }
-            }
-            if(e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-                if (currentIndex > 0) {
-                    currentIndex--;
-                    updateClasses();
-                }
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+            new BookViewer(storyData, 'bookContainer');
         });
     </script>
 </body>
