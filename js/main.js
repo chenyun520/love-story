@@ -77,13 +77,8 @@
     
     // 加载用户进度
     function loadUserProgress() {
-        if (window.AuthSystem && window.AuthSystem.isLoggedIn()) {
-            const userProgress = window.AuthSystem.getUserProgress();
-            levelProgress = userProgress || {};
-        } else {
-            // 未登录时使用本地临时存储（不持久化）
-            levelProgress = JSON.parse(sessionStorage.getItem('sheepToolGameProgressTemp') || '{}');
-        }
+        // Use sessionStorage directly as DB is removed
+        levelProgress = JSON.parse(sessionStorage.getItem('sheepToolGameProgressTemp') || '{}');
     }
     
     // 初始化时加载进度
@@ -94,15 +89,6 @@
 
     // 英雄页与教程
     btnStart.addEventListener('click', () => {
-        // 检查登录状态，如果未登录给出提示
-        if (!window.AuthSystem || !window.AuthSystem.isLoggedIn()) {
-            const shouldLogin = confirm('登录后可保存游戏进度，是否现在登录？\n（点击"取消"可继续游戏，但进度不会永久保存）');
-            if (shouldLogin && window.AuthSystem) {
-                window.AuthSystem.openAuthModal();
-                return;
-            }
-        }
-        
         hero.style.display = 'none';
         panelDiff.setAttribute('aria-hidden', 'false');
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -845,42 +831,14 @@
 
         levelProgress[key] = existing;
         
-        // 如果已登录，保存到用户账户
-        if (window.AuthSystem && window.AuthSystem.isLoggedIn()) {
-            if (window.AuthSystem.saveUserProgress(levelProgress)) {
-                console.log('进度已保存到用户账户');
-            } else {
-                console.warn('保存进度失败');
-            }
-        } else {
-            // 未登录时临时保存到sessionStorage（关闭浏览器后丢失）
-            sessionStorage.setItem('sheepToolGameProgressTemp', JSON.stringify(levelProgress));
-            // 提示用户登录以保存进度
-            if (!sessionStorage.getItem('progressSaveRemindShown')) {
-                setTimeout(() => {
-                    showToast('提示：登录后可永久保存游戏进度', 'info');
-                    sessionStorage.setItem('progressSaveRemindShown', 'true');
-                }, 2000);
-            }
-        }
+        // 临时保存到sessionStorage
+        sessionStorage.setItem('sheepToolGameProgressTemp', JSON.stringify(levelProgress));
     }
 
     // 简化初始化（所有关卡已解锁）
     function initializeGame() {
         // 所有关卡已解锁，无需特殊初始化
         console.log('游戏已初始化，所有100个关卡解锁！');
-        
-        // 监听登录状态变化，重新加载进度
-        if (window.AuthSystem) {
-            // 创建一个自定义事件来监听登录状态变化
-            document.addEventListener('userLoginStatusChanged', () => {
-                loadUserProgress();
-                // 如果正在显示关卡面板，刷新显示
-                if (panelLevel && panelLevel.getAttribute('aria-hidden') === 'false') {
-                    generateLevelGrid();
-                }
-            });
-        }
     }
 
     // 显示轻量提示
