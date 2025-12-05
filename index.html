@@ -2,327 +2,165 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <meta name="description" content="小羊工具归位小游戏 - 拖拽工具匹配凹槽，按时通关！">
-    <meta name="keywords" content="小羊, 工具归位, 小游戏, 拖拽匹配, 关卡, 计时">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>小羊工具归位小游戏</title>
-    <link rel="icon" type="image/png" href="image/favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OUR LOVE STORY - 纪念杂志</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Didot:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Inline specific styles for Cover animations if needed */
+        .shake { animation: shake 0.5s; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+    </style>
 </head>
 <body>
-    <div class="game-app">
-        <!-- 英雄页 -->
-        <section id="hero" class="hero sheep-hero">
-            <div class="sheep-clouds"></div>
-            <div class="hero-background">
-                <div class="floating-sheep left-sheep">
-                    <img src="image/羊 (3).png" alt="左侧装饰羊" class="decorative-sheep">
-                </div>
-                <div class="floating-sheep right-sheep">
-                    <img src="image/羊 (3).png" alt="右侧装饰羊" class="decorative-sheep mirror">
-                </div>
-            </div>
-            <div class="hero-inner">
-                <div class="sheep-run">
-                    <img class="npc-sheep" src="image/羊 (3).png" alt="奔跑的小羊NPC">
-                    <div class="sheep-dust"></div>
-                </div>
-                <div class="hero-content">
-                    <h1 class="game-title">小羊工具归位小游戏</h1>
-                    <p class="game-subtitle">作者：陈云 · 拖动工具匹配到上方凹槽 · 限时通关</p>
-                    <div class="hero-actions">
-                        <button id="btnStart" class="btn btn-primary btn-large">开始游戏</button>
-                        <button id="btnHow" class="btn btn-ghost btn-large">怎么玩？</button>
-                        <button id="btnLogin" class="btn btn-ghost btn-large">登录/注册</button>
-                    </div>
-                </div>
-            </div>
-        </section>
 
-        <!-- 游戏主区域容器 -->
-        <div class="game-container" id="gameContainer" aria-hidden="true">
-            <!-- 左侧HUD -->
-            <aside class="hud-left-panel" id="hudLeft">
-                <div class="hud-side-content">
-                    <div class="level-info">
-                        <span class="hud-badge hud-badge-lg">第 <span id="levelNo">1</span> 关</span>
-                        <span class="hud-badge hud-badge-lg">难度：<span id="difficultyName">新手</span></span>
-                    </div>
-                    <button id="btnLevelSelect" class="btn btn-ghost medium">选择关卡</button>
-                    <div class="timer-container">
-                        <div class="timer timer-lg enhanced-timer">
-                            <div class="timer-bar" id="timerBar"></div>
-                            <div class="timer-info">
-                                <span id="timerText">00:30</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </aside>
+    <!-- SECTION 1: COVER & LOGIN -->
+    <section id="loginSection" class="cover-layout">
+        <!-- Decorative Background Elements -->
+        <div class="bg-deco-circle" style="width: 600px; height: 600px; top: -100px; right: -100px;"></div>
+        <div class="bg-deco-circle" style="width: 400px; height: 400px; bottom: -50px; left: -50px;"></div>
 
-            <!-- 游戏主区域 -->
-            <main id="game" class="game">
-                <!-- 游戏开始界面 -->
-                <div id="gameStartScreen" class="game-start-screen">
-                    <div class="start-content">
-                        <div class="start-sheep">
-                            <img src="image/羊 (2).png" alt="小羊" class="start-sheep-img">
-                        </div>
-                        <h2 class="start-title">准备好开始了吗？</h2>
-                        <p class="start-subtitle">拖动工具到对应凹槽，限时完成！</p>
-                        <button id="btnStartGame" class="btn btn-primary btn-xlarge">
-                            🎮 开始游戏
-                        </button>
-                    </div>
+        <div class="cover-content fade-in">
+            <header class="masthead">
+                <h1 class="masthead-title">OUR MEMORY</h1>
+                <div class="masthead-subtitle">LOVE COMMEMORATIVE MAGAZINE</div>
+            </header>
+
+            <div class="login-form">
+                <p style="color: var(--text-light); margin-bottom: 10px;">请输入访问密码</p>
+
+                <div class="input-group">
+                    <input type="password" id="passwordInput" placeholder="● ● ● ● ● ●" maxlength="6">
                 </div>
 
-                <!-- 游戏进行界面 -->
-                <div id="gamePlayScreen" class="game-play-screen" aria-hidden="true">
-                    <div class="slots" id="slots"></div>
-                    <div class="tools-tray" id="toolsTray">
-                        <div class="pan-hints">
-                            <span class="arrow up">↑</span>
-                            <span class="arrow right">→</span>
-                            <span class="arrow down">↓</span>
-                            <span class="arrow left">←</span>
-                            <span class="hint-text">拖动/滑动以查看更多工具</span>
-                        </div>
-                    </div>
-                </div>
+                <div id="loginError" class="error-msg"></div>
 
-                <!-- 小羊跑动动画 -->
-                <div class="game-sheep-runner" id="gameSheepRunner">
-                    <img src="image/羊 (2).png" alt="跑动的小羊" class="runner-sheep">
-                </div>
-
-                <div class="sheep-stickers" id="sheepStickers"></div>
-                <div class="sheep-deco">
-                    <img src="image/羊.svg" class="mini-sheep mini-sheep-1" alt="装饰小羊1">
-                    <img src="image/羊 (3).png" class="mini-sheep mini-sheep-2" alt="装饰小羊2">
-                </div>
-            </main>
-
-            <!-- 右侧HUD -->
-            <aside class="hud-right-panel" id="hudRight">
-                <div class="hud-side-content">
-                    <div class="theme-switch">
-                        <h3 class="switch-title">主题选择</h3>
-                        <button class="btn btn-ghost medium theme-btn" data-theme="pasture">🌾 牧场</button>
-                        <button class="btn btn-ghost medium theme-btn" data-theme="kids">🏠 儿童房</button>
-                        <button class="btn btn-ghost medium theme-btn" data-theme="garage">🚗 车库</button>
-                    </div>
-                    <div class="game-controls">
-                        <h3 class="controls-title">游戏控制</h3>
-                        <button id="btnRestart" class="btn btn-primary medium">🔄 重新开始</button>
-                        <button id="btnBack" class="btn btn-ghost medium">🏠 返回首页</button>
-                    </div>
-                    <div class="sheep-decoration">
-                        <img src="image/羊 (3).png" class="side-sheep" alt="装饰小羊">
-                    </div>
-                </div>
-            </aside>
-        </div>
-
-        <!-- 关卡选择面板 -->
-        <section id="levelPanel" class="panel" aria-hidden="true">
-            <h2>选择关卡</h2>
-            <div class="level-grid" id="levelGrid">
-                <!-- 动态生成100个关卡 -->
-            </div>
-            <div class="level-panel-actions">
-                <button id="btnBackFromLevelPanel" class="btn btn-ghost">返回难度选择</button>
-            </div>
-        </section>
-
-        <!-- 难度选择 -->
-        <section id="difficulty" class="panel difficulty-panel" aria-hidden="true">
-            <div class="difficulty-header">
-                <div class="difficulty-sheep">
-                    <img src="image/羊 (2).png" alt="引导小羊" class="header-sheep">
-                </div>
-                <div class="difficulty-content">
-                    <h2>选择难度</h2>
-                    <p class="difficulty-subtitle">选择适合你的挑战等级</p>
-                </div>
-            </div>
-            <div class="difficulty-grid">
-                <button class="difficulty-card" data-diff="easy" data-shake="none">
-                    <div class="card-icon">🌱</div>
-                    <div class="card-content">
-                        <h3 class="name">新手</h3>
-                        <div class="star-rating">★★★★☆</div>
-                        <p class="desc">工具少 · 时间更宽松 · 适合初学者</p>
-                        <div class="difficulty-details">
-                            <span class="detail">时间: 30秒</span>
-                            <span class="detail">工具: 4-5个</span>
-                            <span class="detail">无晃动</span>
-                        </div>
-                    </div>
-                    <div class="card-sheep">
-                        <img src="image/羊 (2).png" alt="小羊" class="card-sheep-img">
-                    </div>
-                </button>
-                <button class="difficulty-card" data-diff="normal" data-shake="mild">
-                    <div class="card-icon">⚡</div>
-                    <div class="card-content">
-                        <h3 class="name">进阶</h3>
-                        <div class="star-rating">★★★☆☆</div>
-                        <p class="desc">工具适中 · 轻微晃动 · 温和挑战</p>
-                        <div class="difficulty-details">
-                            <span class="detail">时间: 30秒</span>
-                            <span class="detail">工具: 5-6个</span>
-                            <span class="detail special">轻微晃动</span>
-                        </div>
-                    </div>
-                    <div class="card-sheep">
-                        <img src="image/羊 (2).png" alt="小羊" class="card-sheep-img">
-                    </div>
-                </button>
-                <button class="difficulty-card" data-diff="hard" data-shake="moderate">
-                    <div class="card-icon">🔥</div>
-                    <div class="card-content">
-                        <h3 class="name">高手</h3>
-                        <div class="star-rating">★★☆☆☆</div>
-                        <p class="desc">工具多 · 大浮动晃动 · 高手试炼</p>
-                        <div class="difficulty-details">
-                            <span class="detail">时间: 30秒</span>
-                            <span class="detail">工具: 6-8个</span>
-                            <span class="detail special">大浮动晃动</span>
-                        </div>
-                    </div>
-                    <div class="card-sheep">
-                        <img src="image/羊 (2).png" alt="小羊" class="card-sheep-img">
-                    </div>
-                </button>
-                <button class="difficulty-card" data-diff="insane" data-shake="extreme">
-                    <div class="card-icon">💀</div>
-                    <div class="card-content">
-                        <h3 class="name">地狱</h3>
-                        <div class="star-rating">★☆☆☆☆</div>
-                        <p class="desc">剧烈晃动 · 更多干扰 · 极限挑战</p>
-                        <div class="difficulty-details">
-                            <span class="detail">时间: 30秒</span>
-                            <span class="detail">工具: 7-9个</span>
-                            <span class="detail special">剧烈晃动</span>
-                            <span class="detail special">更多干扰</span>
-                        </div>
-                    </div>
-                    <div class="card-sheep">
-                        <img src="image/羊 (2).png" alt="小羊" class="card-sheep-img">
-                    </div>
+                <button id="btnLogin" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+                    OPEN MAGAZINE
                 </button>
             </div>
-        </section>
 
-      
-        <!-- 结果弹窗 -->
-        <div id="modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
-            <div class="modal-content">
-                <div class="result-animation">
-                    <div class="stars-container" id="starsContainer">
-                        <!-- 动态生成星级 -->
-                    </div>
-                </div>
-                <h3 id="modalTitle">干得漂亮！</h3>
-                <p id="modalDesc">全部工具已归位</p>
-                <div class="result-stats" id="resultStats">
-                    <div class="stat-item">
-                        <span class="stat-label">剩余时间</span>
-                        <span class="stat-value" id="timeBonus">+0秒</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">星级奖励</span>
-                        <span class="stat-value" id="starBonus">+0秒</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">总奖励时间</span>
-                        <span class="stat-value" id="totalBonus">+0秒</span>
-                    </div>
-                </div>
-                <div class="modal-actions">
-                    <button id="btnNext" class="btn btn-primary">下一关</button>
-                    <button id="btnRetry" class="btn btn-ghost">重试</button>
-                    <button id="btnHome" class="btn btn-ghost">回到首页</button>
-                </div>
+            <div style="margin-top: 30px; font-size: 0.8rem; color: #aaa;">
+                EST. 2025.11.05
             </div>
         </div>
+    </section>
 
-        <!-- 教程弹窗 -->
-        <div id="howModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
-            <div class="modal-content">
-                <h3>怎么玩？</h3>
-                <ul class="howto">
-                    <li>把下方工具拖动到上方对应造型的凹槽中。</li>
-                    <li>所有工具正确归位且在倒计时结束前完成，即算过关。</li>
-                    <li>难度越高：工具越多、形状越相似、时间越短；地狱模式会随机晃动。</li>
-                    </ul>
-                <div class="modal-actions">
-                    <button id="btnHowClose" class="btn btn-primary">我会了</button>
+    <!-- SECTION 2: TABLE OF CONTENTS (Revealed after login) -->
+    <section id="tocSection" class="toc-section hidden">
+        <div class="toc-header fade-in">
+            <h2 class="toc-title">目录 CONTENTS</h2>
+            <p style="color: var(--text-light); letter-spacing: 2px; margin-top: 10px;">ISSUE 01: BEGINNING</p>
+        </div>
+
+        <div class="toc-grid fade-in" style="animation-delay: 0.2s;">
+
+            <!-- Card 1: Manga -->
+            <a href="manga.html" class="toc-card">
+                <div class="card-img" style="background-image: url('image/cover.png'); background-color: #ffeef0;">
+                    <div class="card-icon">📖</div>
+                </div>
+                <div class="card-content">
+                    <div>
+                        <h3 class="card-title">漫画恋爱史</h3>
+                        <p class="card-desc">从初识到相爱，每一个心动瞬间的漫画记录。</p>
+                    </div>
+                    <div class="card-footer">
+                        READ STORY <span>→</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Card 2: Games -->
+            <a href="game.html" class="toc-card">
+                <div class="card-img" style="background-color: #f0f7ff;">
+                    <div class="card-icon">🎮</div>
+                </div>
+                <div class="card-content">
+                    <div>
+                        <h3 class="card-title">游戏章节</h3>
+                        <p class="card-desc">包含“工具归位”与全新的“水果派对”挑战。</p>
+                    </div>
+                    <div class="card-footer">
+                        PLAY NOW <span>→</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Card 3: Future -->
+            <div class="toc-card" style="cursor: default;">
+                <div class="card-img" style="background-color: #f9f9f9;">
+                    <div class="card-icon" style="color: #ccc;">🚧</div>
+                </div>
+                <div class="card-content">
+                    <div>
+                        <h3 class="card-title" style="color: #999;">待开发</h3>
+                        <p class="card-desc">更多精彩内容正在策划中，敬请期待...</p>
+                    </div>
+                    <div class="card-footer" style="color: #ccc;">
+                        COMING SOON
+                    </div>
                 </div>
             </div>
+
         </div>
 
-        <!-- 登录/注册弹窗 -->
-        <div id="authModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
-            <div class="modal-content auth-modal-content">
-                <div class="auth-header">
-                    <h3 id="authTitle">登录</h3>
-                    <p class="auth-subtitle" id="authSubtitle">登录以保存和读取你的游戏进度</p>
-                </div>
-                
-                <!-- 登录表单 -->
-                <form id="loginForm" class="auth-form">
-                    <div class="form-group">
-                        <label for="loginUsername">用户名</label>
-                        <input type="text" id="loginUsername" placeholder="请输入用户名" required autocomplete="username">
-                    </div>
-                    <div class="form-group">
-                        <label for="loginPassword">密码</label>
-                        <input type="password" id="loginPassword" placeholder="请输入密码" required autocomplete="current-password">
-                    </div>
-                    <div class="form-error" id="loginError"></div>
-                    <div class="modal-actions">
-                        <button type="submit" class="btn btn-primary btn-large">登录</button>
-                        <button type="button" id="switchToRegister" class="btn btn-ghost">还没有账号？注册</button>
-                    </div>
-                </form>
-
-                <!-- 注册表单 -->
-                <form id="registerForm" class="auth-form" style="display: none;">
-                    <div class="form-group">
-                        <label for="registerUsername">用户名</label>
-                        <input type="text" id="registerUsername" placeholder="请输入用户名（3-20个字符）" required autocomplete="username" minlength="3" maxlength="20">
-                    </div>
-                    <div class="form-group">
-                        <label for="registerPassword">密码</label>
-                        <input type="password" id="registerPassword" placeholder="请输入密码（至少6个字符）" required autocomplete="new-password" minlength="6">
-                    </div>
-                    <div class="form-group">
-                        <label for="registerPasswordConfirm">确认密码</label>
-                        <input type="password" id="registerPasswordConfirm" placeholder="请再次输入密码" required autocomplete="new-password" minlength="6">
-                    </div>
-                    <div class="form-error" id="registerError"></div>
-                    <div class="modal-actions">
-                        <button type="submit" class="btn btn-primary btn-large">注册</button>
-                        <button type="button" id="switchToLogin" class="btn btn-ghost">已有账号？登录</button>
-                    </div>
-                </form>
-            </div>
+        <!-- Global Love Timer Footer -->
+        <div id="loveTimer" style="margin-top: 50px; text-align: center; color: var(--text-light);">
+            <!-- Injected by JS -->
         </div>
+    </section>
 
-        <!-- 用户信息显示 -->
-        <div id="userInfo" class="user-info" style="display: none;">
-            <div class="user-info-content">
-                <span class="user-name" id="userNameDisplay"></span>
-                <button id="btnLogout" class="btn btn-ghost small">退出登录</button>
-            </div>
-        </div>
-    </div>
+    <script src="js/seasons.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const passwordInput = document.getElementById('passwordInput');
+            const btnLogin = document.getElementById('btnLogin');
+            const loginError = document.getElementById('loginError');
+            const loginSection = document.getElementById('loginSection');
+            const tocSection = document.getElementById('tocSection');
 
-    <script src="js/auth.js"></script>
-    <script src="js/main.js"></script>
+            // 1. Check Session
+            if (sessionStorage.getItem('isLoggedIn') === 'true') {
+                showTOC(false);
+            }
+
+            // 2. Login Logic
+            function login() {
+                if (passwordInput.value === '251105') {
+                    sessionStorage.setItem('isLoggedIn', 'true');
+                    showTOC(true);
+                } else {
+                    loginError.textContent = "密码错误 (Hint: 251105)";
+                    passwordInput.classList.add('shake');
+                    setTimeout(() => passwordInput.classList.remove('shake'), 500);
+                }
+            }
+
+            function showTOC(animate) {
+                if(animate) {
+                    loginSection.style.opacity = '0';
+                    loginSection.style.transition = 'opacity 0.5s';
+                    setTimeout(() => {
+                        loginSection.classList.add('hidden');
+                        tocSection.classList.remove('hidden');
+                    }, 500);
+                } else {
+                    loginSection.classList.add('hidden');
+                    tocSection.classList.remove('hidden');
+                }
+            }
+
+            btnLogin.addEventListener('click', login);
+            passwordInput.addEventListener('keypress', (e) => {
+                if(e.key === 'Enter') login();
+            });
+        });
+    </script>
 </body>
 </html>
