@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>趣味挑战 - Mini Games</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body { background: #f8f9fa; }
+
+        /* Magazine Game Header */
+        .game-nav {
+            background: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            z-index: 100;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            margin-top: 80px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .mode-btn {
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 2px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--text-light);
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            border-color: var(--accent-purple);
+            color: var(--accent-purple);
+            background: rgba(124, 92, 255, 0.05);
+        }
+
+        .game-canvas-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+            min-height: 600px;
+            position: relative;
+        }
+
+        /* --- Override specific game parts for clean look --- */
+        .slots {
+            background: #fafafa !important;
+            border: 2px dashed #ddd !important;
+            box-shadow: none !important;
+        }
+
+        .slot {
+            background: white !important;
+            border: 2px solid #eee !important;
+        }
+
+        .slot.success {
+            border-color: var(--success) !important;
+            background: #e8f5e9 !important;
+        }
+
+        .tools-tray {
+            background: #f9f9f9 !important;
+            border-top: 2px solid #eee !important;
+            box-shadow: none !important;
+        }
+
+        .tool {
+            background: white !important;
+            border: 1px solid #ddd !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+        }
+
+        .hud-badge {
+            background: white !important;
+            color: var(--text-main) !important;
+            border: 2px solid var(--accent-purple) !important;
+            box-shadow: none !important;
+            font-size: 1.2rem !important;
+            padding: 10px 20px !important;
+            min-height: auto !important;
+            border-radius: 30px !important;
+        }
+
+        /* Fruit Mode Specifics */
+        .mode-fruit .slots {
+            background: #fff8e1 !important; /* Light yellow bg for fruit */
+            border-color: #ffe082 !important;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="game-nav">
+        <a href="index.html" class="btn btn-ghost" style="padding: 5px 15px; font-size: 0.9rem;">← 返回目录</a>
+        <div style="font-weight: bold;">MINI GAMES</div>
+        <div style="width: 80px;"></div>
+    </nav>
+
+    <div class="container">
+
+        <!-- Mode Toggles -->
+        <div class="mode-selector">
+            <button class="mode-btn active" id="btnModeTools">🔧 工具归位</button>
+            <button class="mode-btn" id="btnModeFruit">🍎 水果派对</button>
+        </div>
+
+        <div class="game-canvas-container" id="gameContainer">
+
+            <!-- Game Content is injected by main.js, but we need the skeleton here -->
+             <main id="game" class="game" style="background: transparent; border: none; box-shadow: none; padding: 0;">
+
+                <!-- HUD -->
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                    <div class="hud-badge">第 <span id="levelNo">1</span> 关</div>
+                    <div class="hud-badge" id="timerDisplay">00:30</div>
+                </div>
+
+                <!-- Play Area -->
+                <div id="gamePlayScreen">
+                    <div class="slots" id="slots"></div>
+                    <div class="tools-tray" id="toolsTray"></div>
+                </div>
+
+                <!-- Start Overlay -->
+                <div id="gameStartScreen" class="game-start-screen" style="position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.95); z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                    <h2 style="font-size: 2rem; margin-bottom: 20px; color: var(--accent-purple);">准备好了吗？</h2>
+                    <p style="margin-bottom: 30px; color: var(--text-light);">将物品拖放到正确的位置！</p>
+                    <button id="btnStartGame" class="btn btn-primary">开始游戏</button>
+                </div>
+
+                 <!-- Success Overlay -->
+                 <div id="modal" class="modal" aria-hidden="true">
+                    <div class="modal-content">
+                        <h3>🎉 挑战成功！</h3>
+                        <div class="modal-actions">
+                            <button id="btnNext" class="btn btn-primary">下一关</button>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- We need to shim the old 'seasons.js' if it's used, but let's stick to clean look -->
+
+    <script>
+        // Global Game State shim for main.js
+        window.GAME_MODE = 'tools';
+    </script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnTools = document.getElementById('btnModeTools');
+            const btnFruit = document.getElementById('btnModeFruit');
+            const gameEl = document.getElementById('game');
+
+            function switchMode(mode) {
+                window.GAME_MODE = mode;
+
+                // Visuals
+                if(mode === 'tools') {
+                    btnTools.classList.add('active');
+                    btnFruit.classList.remove('active');
+                    gameEl.classList.remove('mode-fruit');
+                } else {
+                    btnFruit.classList.add('active');
+                    btnTools.classList.remove('active');
+                    gameEl.classList.add('mode-fruit');
+                }
+
+                // Restart Game Logic (Assuming main.js exposes a reset or we just reload for simplicity in this static context)
+                // Since main.js might not have a clean 'reset' exposed, the safest way in a static page without complex state management is to reload or re-init.
+                // Let's try to trigger the init logic if available.
+
+                if(window.resetGameLevel) {
+                    window.resetGameLevel();
+                } else {
+                    location.reload(); // Fallback if JS isn't hot-swappable
+                }
+            }
+
+            btnTools.addEventListener('click', () => {
+                if(window.GAME_MODE !== 'tools') switchMode('tools');
+            });
+            btnFruit.addEventListener('click', () => {
+                if(window.GAME_MODE !== 'fruit') switchMode('fruit');
+            });
+
+            // Initial Start
+            if(window.initGame) window.initGame();
+        });
+    </script>
+</body>
+</html>
