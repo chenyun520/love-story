@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="description" content="小羊游戏 - 拖拽匹配挑战！">
+    <title>小羊趣味挑战</title>
+    <link rel="icon" type="image/png" href="image/favicon.png">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Magazine Return Button - Added for integration */
+        .btn-back-mag {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 9999;
+            background: rgba(255,255,255,0.9);
+            padding: 10px 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-decoration: none;
+            color: #7C5CFF;
+            font-weight: bold;
+            font-family: sans-serif;
+            border: 2px solid #7C5CFF;
+            transition: all 0.3s;
+        }
+        .btn-back-mag:hover {
+            transform: translateY(-2px);
+            background: #f0f0ff;
+        }
+
+        /* Fruit Mode Styles */
+        .fruit-icon {
+            font-size: 50px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        .game.mode-fruit {
+            background: linear-gradient(180deg, #ffecd2 0%, #fcb69f 100%);
+        }
+
+        .game.mode-fruit .slots {
+            background: rgba(255,255,255,0.8);
+            border-color: #ff9a9e;
+        }
+
+        .game.mode-fruit .slot {
+            border-color: #ff9a9e;
+            background: #fff;
+        }
+    </style>
+</head>
+<body>
+    <script src="js/seasons.js"></script>
+
+    <!-- Magazine Return Link -->
+    <a href="index.html" class="btn-back-mag">← 返回杂志</a>
+
+    <!-- Mode Selection Modal -->
+    <div id="modeSelection" class="modal" aria-hidden="false" style="display: flex; z-index: 2000;">
+        <div class="modal-content">
+            <h3>选择游戏模式</h3>
+            <div class="modal-actions" style="flex-direction: column; gap: 15px;">
+                <button id="modeTools" class="btn btn-primary btn-large">🔧 工具归位</button>
+                <button id="modeFruit" class="btn btn-success btn-large" style="background: linear-gradient(135deg, #ff9966, #ff5e62); color:white;">🍎 水果派对</button>
+                <a href="index.html" class="btn btn-ghost">🔙 返回杂志封面</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-app">
+        <!-- 游戏主容器 -->
+        <div class="game-container" id="gameContainer" style="display:none"> <!-- Hidden initially until mode picked -->
+
+            <!-- Left HUD -->
+            <aside class="hud-left-panel" id="hudLeft">
+                <div class="hud-side-content">
+                    <div class="level-info">
+                        <span class="hud-badge hud-badge-lg">第 <span id="levelNo">1</span> 关</span>
+                        <span class="hud-badge hud-badge-lg">难度：<span id="difficultyName">新手</span></span>
+                    </div>
+                    <button id="btnLevelSelect" class="btn btn-ghost medium">选择关卡</button>
+                    <div class="timer-container">
+                        <div class="timer timer-lg enhanced-timer">
+                            <div class="timer-bar" id="timerBar"></div>
+                            <div class="timer-info">
+                                <span id="timerText">00:30</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Game Area -->
+            <main id="game" class="game">
+                <!-- Start Screen -->
+                <div id="gameStartScreen" class="game-start-screen">
+                    <div class="start-content">
+                        <div class="start-sheep">
+                            <img src="image/羊 (2).png" alt="小羊" class="start-sheep-img">
+                        </div>
+                        <h2 class="start-title">准备好了吗？</h2>
+                        <p class="start-subtitle">拖动物品归位，限时完成！</p>
+                        <button id="btnStartGame" class="btn btn-primary btn-xlarge">🎮 开始游戏</button>
+                    </div>
+                </div>
+
+                <!-- Play Screen -->
+                <div id="gamePlayScreen" class="game-play-screen" aria-hidden="true">
+                    <div class="slots" id="slots"></div>
+                    <div class="tools-tray" id="toolsTray">
+                        <div class="pan-hints">
+                            <span class="hint-text">拖动/滑动以查看更多</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sheep Runner -->
+                <div class="game-sheep-runner" id="gameSheepRunner">
+                    <img src="image/羊 (2).png" alt="跑动的小羊" class="runner-sheep">
+                </div>
+            </main>
+
+            <!-- Right HUD -->
+            <aside class="hud-right-panel" id="hudRight">
+                <div class="hud-side-content">
+                    <div class="theme-switch">
+                        <h3 class="switch-title">主题选择</h3>
+                        <button class="btn btn-ghost medium theme-btn" data-theme="pasture">🌾 牧场</button>
+                        <button class="btn btn-ghost medium theme-btn" data-theme="kids">🏠 儿童房</button>
+                        <button class="btn btn-ghost medium theme-btn" data-theme="garage">🚗 车库</button>
+                    </div>
+                    <div class="game-controls">
+                        <button id="btnRestart" class="btn btn-primary medium">🔄 重新开始</button>
+                        <button id="btnBackToMode" class="btn btn-ghost medium">🔙 切换模式</button>
+                        <a href="index.html" class="btn btn-ghost medium">🏠 返回首页</a>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- Other Modals (Level Select, Diff, Result) - Keeping similar structure but simplified injection -->
+        <!-- Level Panel -->
+        <section id="levelPanel" class="panel" aria-hidden="true">
+            <h2>选择关卡</h2>
+            <div class="level-grid" id="levelGrid"></div>
+            <div class="level-panel-actions">
+                <button id="btnBackFromLevelPanel" class="btn btn-ghost">返回</button>
+            </div>
+        </section>
+
+        <!-- Difficulty Panel -->
+        <section id="difficulty" class="panel difficulty-panel" aria-hidden="true">
+            <h2>选择难度</h2>
+            <div class="difficulty-grid">
+                <button class="difficulty-card" data-diff="easy" data-shake="none">
+                    <div class="card-icon">🌱</div>
+                    <h3 class="name">新手</h3>
+                </button>
+                <button class="difficulty-card" data-diff="normal" data-shake="mild">
+                    <div class="card-icon">⚡</div>
+                    <h3 class="name">进阶</h3>
+                </button>
+                <button class="difficulty-card" data-diff="hard" data-shake="moderate">
+                    <div class="card-icon">🔥</div>
+                    <h3 class="name">高手</h3>
+                </button>
+            </div>
+        </section>
+
+        <!-- Result Modal -->
+        <div id="modal" class="modal" aria-hidden="true">
+            <div class="modal-content">
+                <h3 id="modalTitle">完成！</h3>
+                <!-- Bonus Stats -->
+                 <div id="resultStats" class="result-stats" style="display:none">
+                    <div class="stat-item">
+                        <span class="stat-label">时间奖励</span>
+                        <span class="stat-value bonus" id="timeBonus">+0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">星级奖励</span>
+                        <span class="stat-value bonus" id="starBonus">+0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">总奖励</span>
+                        <span class="stat-value time" id="totalBonus">+0</span>
+                    </div>
+                </div>
+                <p id="modalDesc"></p>
+                <div id="starsContainer" class="stars-container"></div>
+                <div class="modal-actions">
+                    <button id="btnNext" class="btn btn-primary">下一关</button>
+                    <button id="btnRetry" class="btn btn-ghost">重试</button>
+                    <button id="btnHome" class="btn btn-ghost">退出</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Set a global variable to store the selected game mode
+        window.GAME_MODE = 'tools'; // Default
+    </script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const modeSelection = document.getElementById('modeSelection');
+            const gameContainer = document.getElementById('gameContainer');
+            const btnBackToMode = document.getElementById('btnBackToMode');
+
+            function startGame(mode) {
+                window.GAME_MODE = mode;
+                modeSelection.style.display = 'none';
+                gameContainer.style.display = 'grid'; // Show game
+
+                // Update visuals for Fruit Mode
+                const gameMain = document.getElementById('game');
+                if (mode === 'fruit') {
+                    gameMain.classList.add('mode-fruit');
+                } else {
+                    gameMain.classList.remove('mode-fruit');
+                }
+
+                // Init game logic (handled by main.js observing GAME_MODE)
+                if (window.initGame) window.initGame();
+            }
+
+            document.getElementById('modeTools').addEventListener('click', () => startGame('tools'));
+            document.getElementById('modeFruit').addEventListener('click', () => startGame('fruit'));
+
+            btnBackToMode.addEventListener('click', () => {
+                location.reload(); // Simple way to reset everything for mode switch
+            });
+
+            if (sessionStorage.getItem('isLoggedIn') !== 'true') {
+                // We don't force redirect here because embedded game might be accessed directly?
+                // But magazine flow says index -> login.
+                // Let's leave it open or simple redirect.
+                // window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>
