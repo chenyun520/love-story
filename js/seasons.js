@@ -1,88 +1,166 @@
+// Season Effects Manager
+(function() {
+    const seasons = ['spring', 'summer', 'autumn', 'winter'];
+    let currentSeason = 'spring'; // Default
+    let intervalId = null;
+    const container = document.createElement('div');
 
-class SeasonController {
-    constructor() {
-        this.seasons = ['spring', 'summer', 'autumn', 'winter'];
-        this.icons = {
-            spring: '🌸',
-            summer: '☀️',
-            autumn: '🍂',
-            winter: '❄️'
-        };
-        // Check localStorage or default to spring
-        this.currentSeason = localStorage.getItem('season') || 'spring';
+    // Setup container
+    container.id = 'season-container';
+    container.style.position = 'fixed';
+    container.style.top = '0';
+    container.style.left = '0';
+    container.style.width = '100%';
+    container.style.height = '100%';
+    container.style.pointerEvents = 'none';
+    container.style.zIndex = '9999'; // Below modals but above content
+    container.style.overflow = 'hidden';
+    document.body.appendChild(container);
 
-        this.init();
-    }
+    // Create UI Toggle
+    const toggle = document.createElement('div');
+    toggle.className = 'season-toggle';
+    toggle.innerHTML = `
+        <div class="season-btn" data-season="spring" title="春暖花开">🌸</div>
+        <div class="season-btn" data-season="summer" title="夏日气泡">🫧</div>
+        <div class="season-btn" data-season="autumn" title="秋叶飘落">🍂</div>
+        <div class="season-btn" data-season="winter" title="冬雪皑皑">❄️</div>
+    `;
+    // Style the toggle
+    Object.assign(toggle.style, {
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px',
+        display: 'flex',
+        gap: '10px',
+        background: 'rgba(255,255,255,0.8)',
+        backdropFilter: 'blur(5px)',
+        padding: '8px',
+        borderRadius: '30px',
+        boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+        zIndex: '10000'
+    });
+    document.body.appendChild(toggle);
 
-    init() {
-        // Create container
-        this.container = document.createElement('div');
-        this.container.id = 'season-overlay';
-        document.body.appendChild(this.container);
+    // Toggle Logic
+    toggle.addEventListener('click', (e) => {
+        const btn = e.target.closest('.season-btn');
+        if (btn) {
+            setSeason(btn.dataset.season);
+        }
+    });
 
-        // Create toggle button
-        this.btn = document.createElement('button');
-        this.btn.id = 'season-toggle';
-        this.btn.innerText = this.icons[this.currentSeason];
-        this.btn.title = "切换季节主题";
-        this.btn.addEventListener('click', () => this.nextSeason());
-        document.body.appendChild(this.btn);
+    function setSeason(season) {
+        if (!seasons.includes(season)) return;
+        currentSeason = season;
 
-        // Start effect
-        this.renderSeason();
-    }
+        // Update Active UI
+        document.querySelectorAll('.season-btn').forEach(b => {
+            b.style.transform = b.dataset.season === season ? 'scale(1.2)' : 'scale(1)';
+            b.style.opacity = b.dataset.season === season ? '1' : '0.6';
+        });
 
-    nextSeason() {
-        const idx = this.seasons.indexOf(this.currentSeason);
-        this.currentSeason = this.seasons[(idx + 1) % this.seasons.length];
-        localStorage.setItem('season', this.currentSeason);
-        this.btn.innerText = this.icons[this.currentSeason];
-        this.renderSeason();
-    }
-
-    renderSeason() {
         // Clear existing
-        this.container.innerHTML = '';
-        this.container.className = this.currentSeason;
+        container.innerHTML = '';
+        if (intervalId) clearInterval(intervalId);
 
-        if (this.currentSeason === 'spring') {
-            this.createParticles(20, 'spring-petal');
-        } else if (this.currentSeason === 'summer') {
-            this.createParticles(15, 'summer-bubble');
-            // Summer glare overlay
-            const glare = document.createElement('div');
-            glare.style.position = 'absolute';
-            glare.style.top = 0; glare.style.left = 0; glare.style.width = '100%'; glare.style.height = '100%';
-            glare.style.background = 'radial-gradient(circle at 90% 10%, rgba(255,255,224,0.3), transparent 40%)';
-            glare.style.pointerEvents = 'none';
-            this.container.appendChild(glare);
-        } else if (this.currentSeason === 'autumn') {
-            this.createParticles(25, 'autumn-leaf');
-        } else if (this.currentSeason === 'winter') {
-            this.createParticles(50, 'winter-snow');
+        // Start new effect
+        switch (season) {
+            case 'spring': startSpring(); break;
+            case 'summer': startSummer(); break;
+            case 'autumn': startAutumn(); break;
+            case 'winter': startWinter(); break;
         }
     }
 
-    createParticles(count, className) {
-        for (let i = 0; i < count; i++) {
-            const p = document.createElement('div');
-            p.className = className;
-            this.resetParticle(p);
-            // Random delay so they don't all start at once
-            p.style.animationDelay = `-${Math.random() * 10}s`;
-            p.style.animationDuration = `${5 + Math.random() * 10}s`;
-            this.container.appendChild(p);
-        }
-    }
-
-    resetParticle(p) {
+    function createParticle(content, className, animationDuration, sizeRange) {
+        const p = document.createElement('div');
+        p.textContent = content;
+        p.className = 'season-particle ' + className;
+        const size = sizeRange[0] + Math.random() * (sizeRange[1] - sizeRange[0]);
+        p.style.fontSize = `${size}px`;
+        p.style.position = 'absolute';
         p.style.left = Math.random() * 100 + '%';
-        p.style.opacity = Math.random();
-        p.style.transform = `scale(${0.5 + Math.random()})`;
-    }
-}
+        p.style.top = '-50px';
+        p.style.opacity = Math.random() * 0.5 + 0.5;
+        p.style.animation = `fall ${animationDuration}s linear infinite`;
+        p.style.animationDelay = Math.random() * 5 + 's';
 
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    new SeasonController();
-});
+        // Horizontal sway
+        const sway = (Math.random() - 0.5) * 100;
+        p.style.transform = `translateX(${sway}px)`;
+
+        container.appendChild(p);
+
+        // Cleanup
+        setTimeout(() => { p.remove(); }, animationDuration * 1000);
+    }
+
+    // --- Effects ---
+
+    function startSpring() {
+        // Flowers falling slowly
+        const symbols = ['🌸', '💮', '🌱', '🦋'];
+        intervalId = setInterval(() => {
+            const sym = symbols[Math.floor(Math.random() * symbols.length)];
+            createParticle(sym, 'spring-p', 10 + Math.random()*5, [15, 25]);
+        }, 800);
+    }
+
+    function startSummer() {
+        // Bubbles rising (Reverse gravity in CSS or just animate Up)
+        intervalId = setInterval(() => {
+            const p = document.createElement('div');
+            p.className = 'bubble';
+            const size = 10 + Math.random() * 20;
+            p.style.width = size + 'px';
+            p.style.height = size + 'px';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.bottom = '-50px'; // Start from bottom
+            p.style.position = 'absolute';
+            p.style.background = 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), rgba(255,255,255,0.2))';
+            p.style.borderRadius = '50%';
+            p.style.animation = `rise ${8 + Math.random()*5}s linear infinite`;
+            container.appendChild(p);
+            setTimeout(() => p.remove(), 13000);
+        }, 500);
+    }
+
+    function startAutumn() {
+        // Leaves falling
+        const symbols = ['🍂', '🍁', '🌾'];
+        intervalId = setInterval(() => {
+            const sym = symbols[Math.floor(Math.random() * symbols.length)];
+            createParticle(sym, 'autumn-p', 8 + Math.random()*4, [20, 30]);
+        }, 600);
+    }
+
+    function startWinter() {
+        // Snow
+        intervalId = setInterval(() => {
+            createParticle('❄️', 'winter-p', 5 + Math.random()*5, [10, 20]);
+        }, 200);
+    }
+
+    // Inject Styles for Animations
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fall {
+            0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            100% { transform: translateY(110vh) translateX(50px) rotate(360deg); opacity: 0; }
+        }
+        @keyframes rise {
+            0% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 0.8; }
+            100% { transform: translateY(-110vh) translateX(50px); opacity: 0; }
+        }
+        .season-btn { cursor: pointer; transition: transform 0.2s; font-size: 1.5rem; }
+        .season-btn:hover { transform: scale(1.2); }
+    `;
+    document.head.appendChild(style);
+
+    // Initialize
+    setSeason('spring');
+
+})();
