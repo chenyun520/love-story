@@ -33,6 +33,8 @@
     const btnRetry = document.getElementById('btnRetry');
     const btnHome = document.getElementById('btnHome');
 
+    // === DATA SETS ===
+
     const TOOLS = [
         { id: 'wrench', name: '扳手', emoji: '🔧' },
         { id: 'hammer', name: '锤子', emoji: '🔨' },
@@ -44,6 +46,19 @@
         { id: 'bolt', name: '螺栓', emoji: '🔩' },
         { id: 'paint', name: '油漆', emoji: '🖌️' },
         { id: 'helmet', name: '安全帽', emoji: '⛑️' }
+    ];
+
+    const FRUITS = [
+        { id: 'apple', name: '苹果', emoji: '🍎' },
+        { id: 'banana', name: '香蕉', emoji: '🍌' },
+        { id: 'orange', name: '橘子', emoji: '🍊' },
+        { id: 'grape', name: '葡萄', emoji: '🍇' },
+        { id: 'watermelon', name: '西瓜', emoji: '🍉' },
+        { id: 'peach', name: '桃子', emoji: '🍑' },
+        { id: 'cherry', name: '樱桃', emoji: '🍒' },
+        { id: 'strawberry', name: '草莓', emoji: '🍓' },
+        { id: 'pineapple', name: '菠萝', emoji: '🍍' },
+        { id: 'pear', name: '梨子', emoji: '🍐' }
     ];
 
     const DIFFS = {
@@ -62,9 +77,20 @@
         { id: 'fake-hook', name: '吊钩', emoji: '🪝' }
     ];
 
+    // Simple distractors for Fruit Mode
+    const FAKE_FRUITS = [
+        { id: 'fake-veg1', name: '西兰花', emoji: '🥦' },
+        { id: 'fake-veg2', name: '胡萝卜', emoji: '🥕' },
+        { id: 'fake-veg3', name: '玉米', emoji: '🌽' },
+        { id: 'fake-veg4', name: '辣椒', emoji: '🌶️' },
+        { id: 'fake-veg5', name: '蘑菇', emoji: '🍄' }
+    ];
+
     let currentDiffKey = 'easy';
     let currentLevel = 1;
-    let levelTools = [];
+    let currentItems = []; // The active dataset (Tools or Fruits)
+    let currentDistractors = []; // Active distractors
+    let levelTools = []; // Items selected for this specific level
     let placedCount = 0;
     let countdownId = null;
     let timeLeft = 0;
@@ -92,21 +118,33 @@
     // 扩展为100关，全部解锁
     const MAX_LEVEL = 100;
 
-    // 英雄页与教程
-    btnStart.addEventListener('click', () => {
-        // 检查登录状态，如果未登录给出提示
-        if (!window.AuthSystem || !window.AuthSystem.isLoggedIn()) {
-            const shouldLogin = confirm('登录后可保存游戏进度，是否现在登录？\n（点击"取消"可继续游戏，但进度不会永久保存）');
-            if (shouldLogin && window.AuthSystem) {
-                window.AuthSystem.openAuthModal();
-                return;
-            }
+    // 监听初始化（由 game.html 调用）
+    window.initGame = function() {
+        const mode = window.GAME_MODE || 'tools';
+        if (mode === 'fruit') {
+            currentItems = FRUITS;
+            currentDistractors = FAKE_FRUITS;
+        } else {
+            currentItems = TOOLS;
+            currentDistractors = FAKE_TOOLS;
         }
         
-        hero.style.display = 'none';
+        // Show Hero/Diff selection again or go straight to diff
         panelDiff.setAttribute('aria-hidden', 'false');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+    };
+
+    // 英雄页与教程 (Not used much if started via mode selection, but kept for standalone)
+    if (btnStart) {
+        btnStart.addEventListener('click', () => {
+             // 检查登录状态，如果未登录给出提示
+            if (!window.AuthSystem || !window.AuthSystem.isLoggedIn()) {
+                // Simplified login check logic
+            }
+            hero.style.display = 'none';
+            panelDiff.setAttribute('aria-hidden', 'false');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
     btnHow.addEventListener('click', () => openModal(howModal));
     btnHowClose.addEventListener('click', () => closeModal(howModal));
 
@@ -162,10 +200,10 @@
             gameContainer.setAttribute('aria-hidden', 'true');
         }
 
-        panelDiff.setAttribute('aria-hidden', 'true');
-        panelLevel.setAttribute('aria-hidden', 'true');
-        hero.style.display = '';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Return to Mode Selection actually? No, return to Magazine usually.
+        // But for "Back", let's just go to Diff panel
+        panelDiff.setAttribute('aria-hidden', 'false');
+        // Or if we want to go back to Magazine, use the link at top.
     });
 
     // 结果弹窗
@@ -203,12 +241,13 @@
         difficultyNameEl.textContent = diff.name;
         levelNoEl.textContent = String(currentLevel);
 
-        const toolCount = Math.min(TOOLS.length, diff.toolsBase + (currentLevel - 1) * diff.addPerLevel);
-        levelTools = pickRandom(TOOLS, toolCount);
+        // Logic to pick items based on currentItems (Tools/Fruits)
+        const toolCount = Math.min(currentItems.length, diff.toolsBase + (currentLevel - 1) * diff.addPerLevel);
+        levelTools = pickRandom(currentItems, toolCount);
 
         buildSlots(levelTools);
         const distractorCount = diff.distractors || 0;
-        const distractors = pickRandom(FAKE_TOOLS, distractorCount);
+        const distractors = pickRandom(currentDistractors, distractorCount);
         buildTools(levelTools, { shake: diff.shake, distractors });
         placeSheepStickers();
         // 不立即开始倒计时，显示游戏开始界面，由玩家点击开始按钮后启动
@@ -239,6 +278,13 @@
             ghost.textContent = tool.emoji;
             const rot = (Math.random()*10 - 5);
             ghost.style.transform = `translate(-50%,-50%) rotate(${rot}deg)`;
+
+            // Adjust font size for Fruit mode if needed
+            if (window.GAME_MODE === 'fruit') {
+                ghost.style.fontSize = '3.5rem';
+                ghost.style.filter = 'brightness(0) opacity(0.2)'; // More silhouette-like
+            }
+
             slot.appendChild(ghost);
 
             slotsEl.appendChild(slot);
@@ -263,6 +309,7 @@
             const icon = document.createElement('div');
             icon.className = 'emoji';
             icon.textContent = tool.emoji;
+            if (window.GAME_MODE === 'fruit') icon.style.fontSize = '3.5rem'; // Bigger fruits
             el.appendChild(icon);
 
             const name = document.createElement('div');
@@ -284,6 +331,7 @@
             const icon = document.createElement('div');
             icon.className = 'emoji';
             icon.textContent = tool.emoji;
+            if (window.GAME_MODE === 'fruit') icon.style.fontSize = '3.5rem';
             el.appendChild(icon);
 
             const name = document.createElement('div');
@@ -387,7 +435,10 @@
                     slot.innerHTML = ''; // 清掉剪影文本
                     const ok = document.createElement('div');
                     ok.className = 'emoji';
-                    ok.textContent = TOOLS.find(t=>t.id===toolId)?.emoji || '✅';
+                    // Look in BOTH lists to find the matching emoji for success mark
+                    const match = [...TOOLS, ...FRUITS].find(t=>t.id===toolId);
+                    ok.textContent = match?.emoji || '✅';
+                    if (window.GAME_MODE === 'fruit') ok.style.fontSize = '3.5rem';
                     slot.appendChild(ok);
                     toolEl.remove();
                     placedCount += 1;

@@ -14,6 +14,7 @@
             align-items: center;
             min-height: 100vh;
             overflow: hidden;
+            font-family: 'Noto Sans SC', sans-serif;
         }
 
         .header-nav {
@@ -45,9 +46,6 @@
         }
 
         /* Simplified Book: Just a stack of cards that slide/fade for better mobile compatibility */
-        /* A true 3D flipbook is hard to make responsive perfectly without a heavy library. */
-        /* Let's try a "Stack 3D" effect where cards slide off. */
-
         .card-stack {
             position: relative;
             width: 100%;
@@ -81,12 +79,23 @@
             padding-bottom: 5px;
             margin-bottom: 20px;
             color: var(--text-main);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .comic-title {
+            font-size:0.8em;
+            font-weight:normal;
+            margin-left:10px;
+            color: #666;
         }
 
         .dialogue-row {
             display: flex;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             align-items: flex-start;
+            position: relative;
         }
 
         .dialogue-row.shepherd {
@@ -106,43 +115,57 @@
             font-size: 1.2rem;
             color: white;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 2px solid white;
         }
 
         .avatar.shepherd-avi { background: var(--accent-purple); }
         .avatar.sheep-avi { background: var(--accent-pink); }
 
         .bubble {
-            max-width: 70%;
-            padding: 15px;
+            max-width: 75%;
+            padding: 15px 20px;
             border-radius: 20px;
             font-size: 1rem;
-            line-height: 1.5;
+            line-height: 1.6;
             position: relative;
             margin: 0 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 2px 2px 0px rgba(0,0,0,0.05);
+            border: 2px solid;
         }
 
         .bubble.shepherd-bubble {
-            background: #f3e5f5; /* Light Purple */
+            background: #f8f0ff;
             color: #4a148c;
+            border-color: #e1bee7;
             border-top-right-radius: 0;
         }
 
         .bubble.sheep-bubble {
-            background: #fce4ec; /* Light Pink */
+            background: #fff0f5;
             color: #880e4f;
+            border-color: #f8bbd0;
             border-top-left-radius: 0;
         }
 
+        /* Comic/Sketch Effect for Images */
         .comic-image {
             width: 100%;
-            max-height: 300px;
+            max-height: 350px;
             object-fit: cover;
-            border: 5px solid white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            transform: rotate(-2deg);
-            margin: 10px 0 20px 0;
-            border-radius: 4px;
+            border: 8px solid white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transform: rotate(-1deg);
+            margin: 15px 0 25px 0;
+            border-radius: 2px;
+            /* Sketchy Filter */
+            filter: contrast(1.1) brightness(1.05);
+        }
+
+        .sketch-decor {
+            position: absolute;
+            font-size: 1.5rem;
+            opacity: 0.8;
+            pointer-events: none;
         }
 
         /* Controls */
@@ -204,13 +227,13 @@
         @media(min-width: 800px) {
             .story-card {
                 padding: 50px;
-                /* Look like an open book spread on desktop?
-                   Keeping it single page for consistency but wider */
             }
         }
     </style>
 </head>
 <body>
+
+    <script src="js/seasons.js"></script>
 
     <nav class="header-nav">
         <a href="index.html" class="btn btn-ghost" style="padding: 5px 15px; font-size: 0.9rem;">
@@ -365,9 +388,8 @@
                 date: "2025.11.05",
                 title: "我们在一起了",
                 content: [
-                    { type: "sheep", text: "今天请你吃牛肉火锅了喔 我说有问题要问问你 感觉你很紧张啊... 其实是怕你是一时兴起罢了 所以问你想好了没\n这天我们俩饭后徒步 走了好远好远哈哈哈哈哈哈哈 穿皮鞋的你老实了吗！" },
-                    { type: "shepherd", text: "时间线聚合，正式在一起，过去种种皆为序章，全新的篇章从此开始..." },
-                    { type: "shepherd", text: "回看这段时间，就像做了一场微色的美梦... 喜欢你总是耐心听我的碎碎念，喜欢看你在车后排睡觉时像小羊一样安静的样子，喜欢和你在一起的每分每秒。以后一起慢慢走，慢慢看，去经历更多更美好的风景。" }
+                    { type: "sheep", text: "今天请你吃牛肉火锅了喔 我说有问题要问问你 感觉你很紧张啊... 本来是有很多想问的 想了想有些事情也没必要纠结 行动就是答案 其实是怕你是一时兴起罢了 所以问你想好了没\n这天我们俩饭后徒步 走了好远好远哈哈哈哈哈哈哈 穿皮鞋的你老实了吗！" },
+                    { type: "shepherd", text: "时间线聚合，正式在一起，过去种种皆为序章，全新的篇章从此开始...回看这段时间，就像做了一场微色的美梦。从主持比赛到方岩第一次约会到现在的每一天，我们一起经历了好多点点滴滴。记得你送的价值千元保温杯的惊喜（实话实话一般的男的你会送他这么好的杯子吗？），记得星巴克咖啡的温度，记得绿道上微风吹过的感觉，记得耳机里那一首首我们共同听过的歌，当然记得第一次拥抱时转圈圈暗爽的瞬间。每一个细节都像一颗颗闪亮的星星，点缀着我们的故事。喜欢你总是耐心听我的碎碎念，喜欢看你在车后排睡觉时像小羊一样安静的样子，喜欢和你在一起的每分每秒。以后一起慢慢走，慢慢看，去经历更多更美好的风景。" }
                 ]
             }
         ];
@@ -379,14 +401,22 @@
             storyData.forEach((data, index) => {
                 const card = document.createElement('div');
                 card.className = 'story-card';
-                // Reverse order so first item is on top in DOM visually (though we handle via z-index in JS)
-                // Actually, let's just render them and control classes.
 
-                let html = `<div class="comic-date">${data.date} <span style="font-size:0.8em; font-weight:normal; margin-left:10px;">${data.title}</span></div>`;
+                let html = `
+                    <div class="comic-date">
+                        ${data.date}
+                        <span class="comic-title">${data.title}</span>
+                    </div>
+                `;
 
                 data.content.forEach(item => {
                     if (item.type === 'image') {
-                        html += `<img src="${item.src}" class="comic-image" loading="lazy" onerror="this.src='image/gallery_02.jpg'">`;
+                        html += `
+                            <div style="position:relative;">
+                                <img src="${item.src}" class="comic-image" loading="lazy" onerror="this.src='image/gallery_02.jpg'">
+                                <div class="sketch-decor" style="bottom:-10px; right:-10px;">✨</div>
+                            </div>
+                        `;
                     } else {
                         const isShepherd = item.type === 'shepherd';
                         const avatarChar = isShepherd ? '☁️' : '🐑';
@@ -394,11 +424,16 @@
                         const bubbleClass = isShepherd ? 'shepherd-bubble' : 'sheep-bubble';
                         const rowClass = isShepherd ? 'shepherd' : '';
 
+                        // Add some random "sketch" icons
+                        const decor = Math.random() > 0.7 ? (isShepherd ? '🎵' : '💢') : '';
+                        const decorStyle = isShepherd ? 'left:-10px; top:-10px;' : 'right:-10px; top:-10px;';
+
                         html += `
                             <div class="dialogue-row ${rowClass}">
                                 <div class="avatar ${avatarClass}">${avatarChar}</div>
                                 <div class="bubble ${bubbleClass}">
                                     ${item.text.replace(/\n/g, '<br>')}
+                                    ${decor ? `<div class="sketch-decor" style="position:absolute; ${decorStyle}">${decor}</div>` : ''}
                                 </div>
                             </div>
                         `;
