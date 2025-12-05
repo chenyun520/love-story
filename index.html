@@ -3,326 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <meta name="description" content="小羊工具归位小游戏 - 拖拽工具匹配凹槽，按时通关！">
-    <meta name="keywords" content="小羊, 工具归位, 小游戏, 拖拽匹配, 关卡, 计时">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>小羊工具归位小游戏</title>
-    <link rel="icon" type="image/png" href="image/favicon.png">
+    <title>恋爱纪念杂志</title>
+    <!-- Google Fonts: Noto Sans SC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Specific styles for the login/magazine entry */
+        body.magazine-mode {
+            background: linear-gradient(135deg, #4A148C 0%, #7B1FA2 100%);
+            color: #ffffff;
+            font-family: 'Noto Sans SC', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-container, .magazine-cover {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .login-title {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.2);
+            color: #fff;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            text-align: center;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .login-input:focus {
+            border-color: #fff;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: #fff;
+            color: #4A148C;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Magazine Cover Styles */
+        .magazine-header h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .magazine-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+        }
+
+        .magazine-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .menu-item {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 15px;
+            text-decoration: none;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.02);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .menu-item.pending {
+            opacity: 0.7;
+            cursor: default;
+        }
+
+        .names-display {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .error-msg {
+            color: #ff8a80;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            min-height: 20px;
+        }
+    </style>
 </head>
-<body>
-    <div class="game-app">
-        <!-- 英雄页 -->
-        <section id="hero" class="hero sheep-hero">
-            <div class="sheep-clouds"></div>
-            <div class="hero-background">
-                <div class="floating-sheep left-sheep">
-                    <img src="image/羊 (3).png" alt="左侧装饰羊" class="decorative-sheep">
-                </div>
-                <div class="floating-sheep right-sheep">
-                    <img src="image/羊 (3).png" alt="右侧装饰羊" class="decorative-sheep mirror">
-                </div>
+<body class="magazine-mode">
+
+    <!-- Login Section -->
+    <div id="loginSection" class="login-container">
+        <div class="login-title">欢迎回来</div>
+        <p style="margin-bottom: 20px; opacity: 0.8;">请输入专属纪念日密码</p>
+        <input type="password" id="passwordInput" class="login-input" placeholder="密码" maxlength="6">
+        <div id="loginError" class="error-msg"></div>
+        <button id="btnLogin" class="login-btn">进入杂志</button>
+    </div>
+
+    <!-- Magazine Cover / Main Menu -->
+    <div id="magazineSection" class="magazine-cover hidden">
+        <header class="magazine-header">
+            <h1>恋爱纪念杂志</h1>
+            <div class="magazine-subtitle">Memorial Magazine</div>
+        </header>
+
+        <nav class="magazine-menu">
+            <a href="game.html" class="menu-item">
+                <span>🎮 游戏章节 (Game)</span>
+            </a>
+            <a href="manga.html" class="menu-item">
+                <span>📖 漫画恋爱史 (Love Story)</span>
+            </a>
+            <div class="menu-item pending">
+                <span>🚧 待开发 (Pending)</span>
             </div>
-            <div class="hero-inner">
-                <div class="sheep-run">
-                    <img class="npc-sheep" src="image/羊 (3).png" alt="奔跑的小羊NPC">
-                    <div class="sheep-dust"></div>
-                </div>
-                <div class="hero-content">
-                    <h1 class="game-title">小羊工具归位小游戏</h1>
-                    <p class="game-subtitle">作者：陈云 · 拖动工具匹配到上方凹槽 · 限时通关</p>
-                    <div class="hero-actions">
-                        <button id="btnStart" class="btn btn-primary btn-large">开始游戏</button>
-                        <button id="btnHow" class="btn btn-ghost btn-large">怎么玩？</button>
-                        <button id="btnLogin" class="btn btn-ghost btn-large">登录/注册</button>
-                    </div>
-                </div>
-            </div>
-        </section>
+        </nav>
 
-        <!-- 游戏主区域容器 -->
-        <div class="game-container" id="gameContainer" aria-hidden="true">
-            <!-- 左侧HUD -->
-            <aside class="hud-left-panel" id="hudLeft">
-                <div class="hud-side-content">
-                    <div class="level-info">
-                        <span class="hud-badge hud-badge-lg">第 <span id="levelNo">1</span> 关</span>
-                        <span class="hud-badge hud-badge-lg">难度：<span id="difficultyName">新手</span></span>
-                    </div>
-                    <button id="btnLevelSelect" class="btn btn-ghost medium">选择关卡</button>
-                    <div class="timer-container">
-                        <div class="timer timer-lg enhanced-timer">
-                            <div class="timer-bar" id="timerBar"></div>
-                            <div class="timer-info">
-                                <span id="timerText">00:30</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </aside>
-
-            <!-- 游戏主区域 -->
-            <main id="game" class="game">
-                <!-- 游戏开始界面 -->
-                <div id="gameStartScreen" class="game-start-screen">
-                    <div class="start-content">
-                        <div class="start-sheep">
-                            <img src="image/羊 (2).png" alt="小羊" class="start-sheep-img">
-                        </div>
-                        <h2 class="start-title">准备好开始了吗？</h2>
-                        <p class="start-subtitle">拖动工具到对应凹槽，限时完成！</p>
-                        <button id="btnStartGame" class="btn btn-primary btn-xlarge">
-                            🎮 开始游戏
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 游戏进行界面 -->
-                <div id="gamePlayScreen" class="game-play-screen" aria-hidden="true">
-                    <div class="slots" id="slots"></div>
-                    <div class="tools-tray" id="toolsTray">
-                        <div class="pan-hints">
-                            <span class="arrow up">↑</span>
-                            <span class="arrow right">→</span>
-                            <span class="arrow down">↓</span>
-                            <span class="arrow left">←</span>
-                            <span class="hint-text">拖动/滑动以查看更多工具</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 小羊跑动动画 -->
-                <div class="game-sheep-runner" id="gameSheepRunner">
-                    <img src="image/羊 (2).png" alt="跑动的小羊" class="runner-sheep">
-                </div>
-
-                <div class="sheep-stickers" id="sheepStickers"></div>
-                <div class="sheep-deco">
-                    <img src="image/羊.svg" class="mini-sheep mini-sheep-1" alt="装饰小羊1">
-                    <img src="image/羊 (3).png" class="mini-sheep mini-sheep-2" alt="装饰小羊2">
-                </div>
-            </main>
-
-            <!-- 右侧HUD -->
-            <aside class="hud-right-panel" id="hudRight">
-                <div class="hud-side-content">
-                    <div class="theme-switch">
-                        <h3 class="switch-title">主题选择</h3>
-                        <button class="btn btn-ghost medium theme-btn" data-theme="pasture">🌾 牧场</button>
-                        <button class="btn btn-ghost medium theme-btn" data-theme="kids">🏠 儿童房</button>
-                        <button class="btn btn-ghost medium theme-btn" data-theme="garage">🚗 车库</button>
-                    </div>
-                    <div class="game-controls">
-                        <h3 class="controls-title">游戏控制</h3>
-                        <button id="btnRestart" class="btn btn-primary medium">🔄 重新开始</button>
-                        <button id="btnBack" class="btn btn-ghost medium">🏠 返回首页</button>
-                    </div>
-                    <div class="sheep-decoration">
-                        <img src="image/羊 (3).png" class="side-sheep" alt="装饰小羊">
-                    </div>
-                </div>
-            </aside>
-        </div>
-
-        <!-- 关卡选择面板 -->
-        <section id="levelPanel" class="panel" aria-hidden="true">
-            <h2>选择关卡</h2>
-            <div class="level-grid" id="levelGrid">
-                <!-- 动态生成100个关卡 -->
-            </div>
-            <div class="level-panel-actions">
-                <button id="btnBackFromLevelPanel" class="btn btn-ghost">返回难度选择</button>
-            </div>
-        </section>
-
-        <!-- 难度选择 -->
-        <section id="difficulty" class="panel difficulty-panel" aria-hidden="true">
-            <div class="difficulty-header">
-                <div class="difficulty-sheep">
-                    <img src="image/羊 (2).png" alt="引导小羊" class="header-sheep">
-                </div>
-                <div class="difficulty-content">
-                    <h2>选择难度</h2>
-                    <p class="difficulty-subtitle">选择适合你的挑战等级</p>
-                </div>
-            </div>
-            <div class="difficulty-grid">
-                <button class="difficulty-card" data-diff="easy" data-shake="none">
-                    <div class="card-icon">🌱</div>
-                    <div class="card-content">
-                        <h3 class="name">新手</h3>
-                        <div class="star-rating">★★★★☆</div>
-                        <p class="desc">工具少 · 时间更宽松 · 适合初学者</p>
-                        <div class="difficulty-details">
-                            <span class="detail">时间: 30秒</span>
-                            <span class="detail">工具: 4-5个</span>
-                            <span class="detail">无晃动</span>
-                        </div>
-                    </div>
-                    <div class="card-sheep">
-                        <img src="image/羊 (2).png" alt="小羊" class="card-sheep-img">
-                    </div>
-                </button>
-                <button class="difficulty-card" data-diff="normal" data-shake="mild">
-                    <div class="card-icon">⚡</div>
-                    <div class="card-content">
-                        <h3 class="name">进阶</h3>
-                        <div class="star-rating">★★★☆☆</div>
-                        <p class="desc">工具适中 · 轻微晃动 · 温和挑战</p>
-                        <div class="difficulty-details">
-                            <span class="detail">时间: 30秒</span>
-                            <span class="detail">工具: 5-6个</span>
-                            <span class="detail special">轻微晃动</span>
-                        </div>
-                    </div>
-                    <div class="card-sheep">
-                        <img src="image/羊 (2).png" alt="小羊" class="card-sheep-img">
-                    </div>
-                </button>
-                <button class="difficulty-card" data-diff="hard" data-shake="moderate">
-                    <div class="card-icon">🔥</div>
-                    <div class="card-content">
-                        <h3 class="name">高手</h3>
-                        <div class="star-rating">★★☆☆☆</div>
-                        <p class="desc">工具多 · 大浮动晃动 · 高手试炼</p>
-                        <div class="difficulty-details">
-                            <span class="detail">时间: 30秒</span>
-                            <span class="detail">工具: 6-8个</span>
-                            <span class="detail special">大浮动晃动</span>
-                        </div>
-                    </div>
-                    <div class="card-sheep">
-                        <img src="image/羊 (2).png" alt="小羊" class="card-sheep-img">
-                    </div>
-                </button>
-                <button class="difficulty-card" data-diff="insane" data-shake="extreme">
-                    <div class="card-icon">💀</div>
-                    <div class="card-content">
-                        <h3 class="name">地狱</h3>
-                        <div class="star-rating">★☆☆☆☆</div>
-                        <p class="desc">剧烈晃动 · 更多干扰 · 极限挑战</p>
-                        <div class="difficulty-details">
-                            <span class="detail">时间: 30秒</span>
-                            <span class="detail">工具: 7-9个</span>
-                            <span class="detail special">剧烈晃动</span>
-                            <span class="detail special">更多干扰</span>
-                        </div>
-                    </div>
-                    <div class="card-sheep">
-                        <img src="image/羊 (2).png" alt="小羊" class="card-sheep-img">
-                    </div>
-                </button>
-            </div>
-        </section>
-
-      
-        <!-- 结果弹窗 -->
-        <div id="modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
-            <div class="modal-content">
-                <div class="result-animation">
-                    <div class="stars-container" id="starsContainer">
-                        <!-- 动态生成星级 -->
-                    </div>
-                </div>
-                <h3 id="modalTitle">干得漂亮！</h3>
-                <p id="modalDesc">全部工具已归位</p>
-                <div class="result-stats" id="resultStats">
-                    <div class="stat-item">
-                        <span class="stat-label">剩余时间</span>
-                        <span class="stat-value" id="timeBonus">+0秒</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">星级奖励</span>
-                        <span class="stat-value" id="starBonus">+0秒</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">总奖励时间</span>
-                        <span class="stat-value" id="totalBonus">+0秒</span>
-                    </div>
-                </div>
-                <div class="modal-actions">
-                    <button id="btnNext" class="btn btn-primary">下一关</button>
-                    <button id="btnRetry" class="btn btn-ghost">重试</button>
-                    <button id="btnHome" class="btn btn-ghost">回到首页</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- 教程弹窗 -->
-        <div id="howModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
-            <div class="modal-content">
-                <h3>怎么玩？</h3>
-                <ul class="howto">
-                    <li>把下方工具拖动到上方对应造型的凹槽中。</li>
-                    <li>所有工具正确归位且在倒计时结束前完成，即算过关。</li>
-                    <li>难度越高：工具越多、形状越相似、时间越短；地狱模式会随机晃动。</li>
-                    </ul>
-                <div class="modal-actions">
-                    <button id="btnHowClose" class="btn btn-primary">我会了</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- 登录/注册弹窗 -->
-        <div id="authModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
-            <div class="modal-content auth-modal-content">
-                <div class="auth-header">
-                    <h3 id="authTitle">登录</h3>
-                    <p class="auth-subtitle" id="authSubtitle">登录以保存和读取你的游戏进度</p>
-                </div>
-                
-                <!-- 登录表单 -->
-                <form id="loginForm" class="auth-form">
-                    <div class="form-group">
-                        <label for="loginUsername">用户名</label>
-                        <input type="text" id="loginUsername" placeholder="请输入用户名" required autocomplete="username">
-                    </div>
-                    <div class="form-group">
-                        <label for="loginPassword">密码</label>
-                        <input type="password" id="loginPassword" placeholder="请输入密码" required autocomplete="current-password">
-                    </div>
-                    <div class="form-error" id="loginError"></div>
-                    <div class="modal-actions">
-                        <button type="submit" class="btn btn-primary btn-large">登录</button>
-                        <button type="button" id="switchToRegister" class="btn btn-ghost">还没有账号？注册</button>
-                    </div>
-                </form>
-
-                <!-- 注册表单 -->
-                <form id="registerForm" class="auth-form" style="display: none;">
-                    <div class="form-group">
-                        <label for="registerUsername">用户名</label>
-                        <input type="text" id="registerUsername" placeholder="请输入用户名（3-20个字符）" required autocomplete="username" minlength="3" maxlength="20">
-                    </div>
-                    <div class="form-group">
-                        <label for="registerPassword">密码</label>
-                        <input type="password" id="registerPassword" placeholder="请输入密码（至少6个字符）" required autocomplete="new-password" minlength="6">
-                    </div>
-                    <div class="form-group">
-                        <label for="registerPasswordConfirm">确认密码</label>
-                        <input type="password" id="registerPasswordConfirm" placeholder="请再次输入密码" required autocomplete="new-password" minlength="6">
-                    </div>
-                    <div class="form-error" id="registerError"></div>
-                    <div class="modal-actions">
-                        <button type="submit" class="btn btn-primary btn-large">注册</button>
-                        <button type="button" id="switchToLogin" class="btn btn-ghost">已有账号？登录</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- 用户信息显示 -->
-        <div id="userInfo" class="user-info" style="display: none;">
-            <div class="user-info-content">
-                <span class="user-name" id="userNameDisplay"></span>
-                <button id="btnLogout" class="btn btn-ghost small">退出登录</button>
-            </div>
+        <div class="names-display">
+            <span>牧羊云</span>
+            <span>&</span>
+            <span>羊</span>
         </div>
     </div>
 
-    <script src="js/auth.js"></script>
-    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginSection = document.getElementById('loginSection');
+            const magazineSection = document.getElementById('magazineSection');
+            const passwordInput = document.getElementById('passwordInput');
+            const btnLogin = document.getElementById('btnLogin');
+            const loginError = document.getElementById('loginError');
+
+            // Check if already logged in (session only)
+            if (sessionStorage.getItem('isLoggedIn') === 'true') {
+                showMagazine();
+            }
+
+            function handleLogin() {
+                const pass = passwordInput.value;
+                if (pass === '251105') {
+                    sessionStorage.setItem('isLoggedIn', 'true');
+                    showMagazine();
+                } else {
+                    loginError.textContent = '密码错误，是不是忘记了纪念日？';
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                }
+            }
+
+            function showMagazine() {
+                loginSection.classList.add('hidden');
+                magazineSection.classList.remove('hidden');
+            }
+
+            btnLogin.addEventListener('click', handleLogin);
+            passwordInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleLogin();
+            });
+        });
+    </script>
 </body>
 </html>

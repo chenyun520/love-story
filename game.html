@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="description" content="小羊工具归位小游戏 - 拖拽工具匹配凹槽，按时通关！">
+    <meta name="keywords" content="小羊, 工具归位, 小游戏, 拖拽匹配, 关卡, 计时">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>小羊工具归位小游戏</title>
+    <link rel="icon" type="image/png" href="image/favicon.png">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Mode Selection Modal (Overlay) -->
+    <div id="modeSelection" class="modal" aria-hidden="false" style="display: flex; z-index: 2000;">
+        <div class="modal-content">
+            <h3>选择游戏模式</h3>
+            <div class="modal-actions" style="flex-direction: column; gap: 15px;">
+                <button id="modeTools" class="btn btn-primary btn-large">🔧 工具归位 (标准版)</button>
+                <button id="modeFruit" class="btn btn-ghost btn-large" style="opacity: 0.7; cursor: not-allowed;">🍎 水果关卡 (待开发)</button>
+                <a href="index.html" class="btn btn-ghost">🔙 返回杂志封面</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-app">
+        <!-- 英雄页 -->
+        <section id="hero" class="hero sheep-hero">
+            <div class="sheep-clouds"></div>
+            <div class="hero-background">
+                <div class="floating-sheep left-sheep">
+                    <img src="image/羊 (3).png" alt="左侧装饰羊" class="decorative-sheep">
+                </div>
+                <div class="floating-sheep right-sheep">
+                    <img src="image/羊 (3).png" alt="右侧装饰羊" class="decorative-sheep mirror">
+                </div>
+            </div>
+            <div class="hero-inner">
+                <div class="sheep-run">
+                    <img class="npc-sheep" src="image/羊 (3).png" alt="奔跑的小羊NPC">
+                    <div class="sheep-dust"></div>
+                </div>
+                <div class="hero-content">
+                    <h1 class="game-title">小羊工具归位小游戏</h1>
+                    <p class="game-subtitle">作者：陈云 · 拖动工具匹配到上方凹槽 · 限时通关</p>
+                    <div class="hero-actions">
+                        <button id="btnStart" class="btn btn-primary btn-large">开始游戏</button>
+                        <button id="btnHow" class="btn btn-ghost btn-large">怎么玩？</button>
+                        <a href="index.html" class="btn btn-ghost btn-large">返回杂志</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 游戏主区域容器 -->
+        <div class="game-container" id="gameContainer" aria-hidden="true">
+            <!-- 左侧HUD -->
+            <aside class="hud-left-panel" id="hudLeft">
+                <div class="hud-side-content">
+                    <div class="level-info">
+                        <span class="hud-badge hud-badge-lg">第 <span id="levelNo">1</span> 关</span>
+                        <span class="hud-badge hud-badge-lg">难度：<span id="difficultyName">新手</span></span>
+                    </div>
+                    <button id="btnLevelSelect" class="btn btn-ghost medium">选择关卡</button>
+                    <div class="timer-container">
+                        <div class="timer timer-lg enhanced-timer">
+                            <div class="timer-bar" id="timerBar"></div>
+                            <div class="timer-info">
+                                <span id="timerText">00:30</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- 游戏主区域 -->
+            <main id="game" class="game">
+                <!-- 游戏开始界面 -->
+                <div id="gameStartScreen" class="game-start-screen">
+                    <div class="start-content">
+                        <div class="start-sheep">
+                            <img src="image/羊 (2).png" alt="小羊" class="start-sheep-img">
+                        </div>
+                        <h2 class="start-title">准备好开始了吗？</h2>
+                        <p class="start-subtitle">拖动工具到对应凹槽，限时完成！</p>
+                        <button id="btnStartGame" class="btn btn-primary btn-xlarge">
+                            🎮 开始游戏
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 游戏进行界面 -->
+                <div id="gamePlayScreen" class="game-play-screen" aria-hidden="true">
+                    <div class="slots" id="slots"></div>
+                    <div class="tools-tray" id="toolsTray">
+                        <div class="pan-hints">
+                            <span class="arrow up">↑</span>
+                            <span class="arrow right">→</span>
+                            <span class="arrow down">↓</span>
+                            <span class="arrow left">←</span>
+                            <span class="hint-text">拖动/滑动以查看更多工具</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 小羊跑动动画 -->
+                <div class="game-sheep-runner" id="gameSheepRunner">
+                    <img src="image/羊 (2).png" alt="跑动的小羊" class="runner-sheep">
+                </div>
+
+                <div class="sheep-stickers" id="sheepStickers"></div>
+                <div class="sheep-deco">
+                    <img src="image/羊.svg" class="mini-sheep mini-sheep-1" alt="装饰小羊1">
+                    <img src="image/羊 (3).png" class="mini-sheep mini-sheep-2" alt="装饰小羊2">
+                </div>
+            </main>
+
+            <!-- 右侧HUD -->
+            <aside class="hud-right-panel" id="hudRight">
+                <div class="hud-side-content">
+                    <div class="theme-switch">
+                        <h3 class="switch-title">主题选择</h3>
+                        <button class="btn btn-ghost medium theme-btn" data-theme="pasture">🌾 牧场</button>
+                        <button class="btn btn-ghost medium theme-btn" data-theme="kids">🏠 儿童房</button>
+                        <button class="btn btn-ghost medium theme-btn" data-theme="garage">🚗 车库</button>
+                    </div>
+                    <div class="game-controls">
+                        <h3 class="controls-title">游戏控制</h3>
+                        <button id="btnRestart" class="btn btn-primary medium">🔄 重新开始</button>
+                        <button id="btnBack" class="btn btn-ghost medium">🏠 返回首页</button>
+                    </div>
+                    <div class="sheep-decoration">
+                        <img src="image/羊 (3).png" class="side-sheep" alt="装饰小羊">
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- 关卡选择面板 -->
+        <section id="levelPanel" class="panel" aria-hidden="true">
+            <h2>选择关卡</h2>
+            <div class="level-grid" id="levelGrid">
+                <!-- 动态生成100个关卡 -->
+            </div>
+            <div class="level-panel-actions">
+                <button id="btnBackFromLevelPanel" class="btn btn-ghost">返回难度选择</button>
+            </div>
+        </section>
+
+        <!-- 难度选择 -->
+        <section id="difficulty" class="panel difficulty-panel" aria-hidden="true">
+            <div class="difficulty-header">
+                <div class="difficulty-sheep">
+                    <img src="image/羊 (2).png" alt="引导小羊" class="header-sheep">
+                </div>
+                <div class="difficulty-content">
+                    <h2>选择难度</h2>
+                    <p class="difficulty-subtitle">选择适合你的挑战等级</p>
+                </div>
+            </div>
+            <div class="difficulty-grid">
+                <button class="difficulty-card" data-diff="easy" data-shake="none">
+                    <div class="card-icon">🌱</div>
+                    <div class="card-content">
+                        <h3 class="name">新手</h3>
+                        <div class="star-rating">★★★★☆</div>
+                        <p class="desc">工具少 · 时间更宽松 · 适合初学者</p>
+                        <div class="difficulty-details">
+                            <span class="detail">时间: 30秒</span>
+                            <span class="detail">工具: 4-5个</span>
+                            <span class="detail">无晃动</span>
+                        </div>
+                    </div>
+                    <div class="card-sheep">
+                        <img src="image/羊 (2).png" alt="小羊" class="card-sheep-img">
+                    </div>
+                </button>
+                <button class="difficulty-card" data-diff="normal" data-shake="mild">
+                    <div class="card-icon">⚡</div>
+                    <div class="card-content">
+                        <h3 class="name">进阶</h3>
+                        <div class="star-rating">★★★☆☆</div>
+                        <p class="desc">工具适中 · 轻微晃动 · 温和挑战</p>
+                        <div class="difficulty-details">
+                            <span class="detail">时间: 30秒</span>
+                            <span class="detail">工具: 5-6个</span>
+                            <span class="detail special">轻微晃动</span>
+                        </div>
+                    </div>
+                    <div class="card-sheep">
+                        <img src="image/羊 (2).png" alt="小羊" class="card-sheep-img">
+                    </div>
+                </button>
+                <button class="difficulty-card" data-diff="hard" data-shake="moderate">
+                    <div class="card-icon">🔥</div>
+                    <div class="card-content">
+                        <h3 class="name">高手</h3>
+                        <div class="star-rating">★★☆☆☆</div>
+                        <p class="desc">工具多 · 大浮动晃动 · 高手试炼</p>
+                        <div class="difficulty-details">
+                            <span class="detail">时间: 30秒</span>
+                            <span class="detail">工具: 6-8个</span>
+                            <span class="detail special">大浮动晃动</span>
+                        </div>
+                    </div>
+                    <div class="card-sheep">
+                        <img src="image/羊 (2).png" alt="小羊" class="card-sheep-img">
+                    </div>
+                </button>
+                <button class="difficulty-card" data-diff="insane" data-shake="extreme">
+                    <div class="card-icon">💀</div>
+                    <div class="card-content">
+                        <h3 class="name">地狱</h3>
+                        <div class="star-rating">★☆☆☆☆</div>
+                        <p class="desc">剧烈晃动 · 更多干扰 · 极限挑战</p>
+                        <div class="difficulty-details">
+                            <span class="detail">时间: 30秒</span>
+                            <span class="detail">工具: 7-9个</span>
+                            <span class="detail special">剧烈晃动</span>
+                            <span class="detail special">更多干扰</span>
+                        </div>
+                    </div>
+                    <div class="card-sheep">
+                        <img src="image/羊 (2).png" alt="小羊" class="card-sheep-img">
+                    </div>
+                </button>
+            </div>
+        </section>
+
+
+        <!-- 结果弹窗 -->
+        <div id="modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+            <div class="modal-content">
+                <div class="result-animation">
+                    <div class="stars-container" id="starsContainer">
+                        <!-- 动态生成星级 -->
+                    </div>
+                </div>
+                <h3 id="modalTitle">干得漂亮！</h3>
+                <p id="modalDesc">全部工具已归位</p>
+                <div class="result-stats" id="resultStats">
+                    <div class="stat-item">
+                        <span class="stat-label">剩余时间</span>
+                        <span class="stat-value" id="timeBonus">+0秒</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">星级奖励</span>
+                        <span class="stat-value" id="starBonus">+0秒</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">总奖励时间</span>
+                        <span class="stat-value" id="totalBonus">+0秒</span>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button id="btnNext" class="btn btn-primary">下一关</button>
+                    <button id="btnRetry" class="btn btn-ghost">重试</button>
+                    <button id="btnHome" class="btn btn-ghost">回到首页</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 教程弹窗 -->
+        <div id="howModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+            <div class="modal-content">
+                <h3>怎么玩？</h3>
+                <ul class="howto">
+                    <li>把下方工具拖动到上方对应造型的凹槽中。</li>
+                    <li>所有工具正确归位且在倒计时结束前完成，即算过关。</li>
+                    <li>难度越高：工具越多、形状越相似、时间越短；地狱模式会随机晃动。</li>
+                    </ul>
+                <div class="modal-actions">
+                    <button id="btnHowClose" class="btn btn-primary">我会了</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Simple Mode Selection Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const modeSelection = document.getElementById('modeSelection');
+            const modeTools = document.getElementById('modeTools');
+
+            // Check login
+            if (sessionStorage.getItem('isLoggedIn') !== 'true') {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            modeTools.addEventListener('click', () => {
+                modeSelection.style.display = 'none';
+            });
+            // Fruit mode is just a placeholder for now
+        });
+    </script>
+</body>
+</html>
