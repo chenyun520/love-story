@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Didot:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/magazine.css">
     <style>
-        /* Inline specific styles for Cover animations if needed */
+        /* Shake Animation for Login */
         .shake { animation: shake 0.5s; }
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
@@ -55,57 +55,6 @@
             100% { transform: translateX(-50%); }
         }
 
-        /* Timer Styles */
-        .love-timer-container {
-            background: rgba(255,255,255,0.8);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 40px auto;
-            max-width: 600px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border: 1px solid rgba(0,0,0,0.05);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .timer-digits {
-            font-family: 'Didot', serif;
-            font-size: 2rem;
-            color: var(--accent-purple);
-            font-weight: bold;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .timer-unit {
-            font-size: 0.8rem;
-            font-family: 'Noto Sans SC', sans-serif;
-            color: var(--text-light);
-            text-align: center;
-            display: block;
-        }
-
-        .sheep-runner-track {
-            height: 40px;
-            position: relative;
-            margin-top: 15px;
-            border-top: 1px dashed #ddd;
-        }
-
-        .running-sheep {
-            position: absolute;
-            font-size: 24px;
-            bottom: 5px;
-            animation: runAcross 4s linear infinite;
-        }
-
-        @keyframes runAcross {
-            0% { left: -10%; transform: scaleX(1); }
-            100% { left: 110%; transform: scaleX(1); }
-        }
-
         /* Cover Image on Login */
         .login-cover-card {
             width: 300px;
@@ -145,7 +94,7 @@
         <div class="bg-deco-circle" style="width: 600px; height: 600px; top: -100px; right: -100px;"></div>
         <div class="bg-deco-circle" style="width: 400px; height: 400px; bottom: -50px; left: -50px;"></div>
 
-        <div class="cover-content fade-in" style="display: flex; flex-direction: column; align-items: center;">
+        <div class="cover-content fade-in" style="display: flex; flex-direction: column; align-items: center; max-width: 600px;">
 
             <!-- New Cover Image Card -->
             <div class="login-cover-card">
@@ -155,8 +104,11 @@
                 </div>
             </div>
 
-            <div class="login-form">
-                <p style="color: var(--text-light); margin-bottom: 10px;">请输入访问密码</p>
+            <!-- Login Timer Container -->
+            <div id="loginTimer" style="width: 100%;"></div>
+
+            <div class="login-form" style="width: 100%; margin-top: 20px;">
+                <p style="color: var(--text-light); margin-bottom: 5px;">请输入访问密码</p>
 
                 <div class="input-group">
                     <input type="password" id="passwordInput" placeholder="● ● ● ● ● ●" maxlength="6">
@@ -164,13 +116,9 @@
 
                 <div id="loginError" class="error-msg"></div>
 
-                <button id="btnLogin" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+                <button id="btnLogin" class="btn btn-primary" style="width: 100%; margin-top: 5px;">
                     OPEN MAGAZINE
                 </button>
-            </div>
-
-            <div style="margin-top: 30px; font-size: 0.8rem; color: #aaa;">
-                EST. 2025.11.05
             </div>
         </div>
     </section>
@@ -182,7 +130,7 @@
             <p style="color: var(--text-light); letter-spacing: 2px; margin-top: 10px;">ISSUE 01: BEGINNING</p>
         </div>
 
-        <!-- NEW: Carousel / Marquee -->
+        <!-- Carousel -->
         <div class="carousel-container fade-in">
             <div class="carousel-track" id="carouselTrack">
                 <!-- Images injected via JS -->
@@ -230,7 +178,7 @@
                 </div>
                 <div class="card-content">
                     <div>
-                        <h3 class="card-title" style="color: #999;">待开发</h3>
+                        <h3 class="card-title">待开发</h3>
                         <p class="card-desc">更多精彩内容正在策划中，敬请期待...</p>
                     </div>
                     <div class="card-footer" style="color: #ccc;">
@@ -242,18 +190,12 @@
         </div>
 
         <!-- Global Love Timer Footer -->
-        <div class="love-timer-container fade-in" style="animation-delay: 0.4s;">
-            <div style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 10px; text-align: center;">我们要在一起很久很久...</div>
-            <div class="timer-digits" id="timerDigits">
-                <!-- 00 DAYS 00 HRS ... -->
-            </div>
-            <div class="sheep-runner-track" id="sheepTrack">
-                <!-- Running Sheep injected here -->
-            </div>
-        </div>
+        <div id="homeTimer" style="margin-top: 50px; max-width: 600px; width:100%;"></div>
+
     </section>
 
     <script src="js/seasons.js"></script>
+    <script src="js/love_timer.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const passwordInput = document.getElementById('passwordInput');
@@ -262,8 +204,6 @@
             const loginSection = document.getElementById('loginSection');
             const tocSection = document.getElementById('tocSection');
             const carouselTrack = document.getElementById('carouselTrack');
-            const timerDigits = document.getElementById('timerDigits');
-            const sheepTrack = document.getElementById('sheepTrack');
 
             // --- CAROUSEL SETUP ---
             const images = [
@@ -279,72 +219,24 @@
                 const div = document.createElement('div');
                 div.className = 'carousel-item';
                 div.style.backgroundImage = `url('${src}')`;
-                // Fallback color if image missing
                 div.style.backgroundColor = '#eee';
                 carouselTrack.appendChild(div);
             });
 
 
             // --- TIMER SETUP ---
-            const startDate = new Date('2025-11-05T18:25:00');
-
-            function updateTimer() {
-                const now = new Date();
-                let diff = now - startDate;
-
-                // If counting UP (we are past the date)
-                // If counting DOWN (future date), diff is negative.
-                // "How long we have been together" usually implies counting UP.
-                // But the date is in the future relative to 2024.
-                // We will display absolute difference with appropriate label logic if needed,
-                // or just absolute "Time Together".
-                // Let's just do absolute time for simplicity as "Duration".
-
-                const isFuture = diff < 0;
-                diff = Math.abs(diff);
-
-                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-                const prefix = isFuture ? "<span style='font-size:0.5em; display:block'>COUNTDOWN</span>" : "";
-
-                timerDigits.innerHTML = `
-                    <div style="text-align:center">${days}<span class="timer-unit">DAYS</span></div>
-                    <div style="text-align:center">${hours}<span class="timer-unit">HRS</span></div>
-                    <div style="text-align:center">${minutes}<span class="timer-unit">MINS</span></div>
-                    <div style="text-align:center">${seconds}<span class="timer-unit">SECS</span></div>
-                `;
-            }
-
-            setInterval(updateTimer, 1000);
-            updateTimer();
-
-            // --- SHEEP ANIMATION ---
-            // "Every second... add a little sheep"
-            // We'll spawn a sheep every second that runs across.
-            setInterval(() => {
-                const sheep = document.createElement('div');
-                sheep.className = 'running-sheep';
-                sheep.textContent = '🐑'; // Or use an image
-                sheep.style.animationDuration = (3 + Math.random() * 2) + 's'; // Random speed
-                sheepTrack.appendChild(sheep);
-
-                // Remove after animation
-                setTimeout(() => {
-                    sheep.remove();
-                }, 5000);
-            }, 1000);
+            // Use the LoveTimer Class
+            // Init for Login Page
+            new LoveTimer('2025-11-05T18:25:00', 'loginTimer');
+            // Init for Home Page
+            new LoveTimer('2025-11-05T18:25:00', 'homeTimer');
 
 
             // --- LOGIN LOGIC ---
-            // 1. Check Session
             if (sessionStorage.getItem('isLoggedIn') === 'true') {
                 showTOC(false);
             }
 
-            // 2. Login Logic
             function login() {
                 if (passwordInput.value === '251105') {
                     sessionStorage.setItem('isLoggedIn', 'true');

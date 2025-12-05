@@ -2,7 +2,6 @@ class LoveTimer {
     constructor(startDateStr, containerId) {
         this.startDate = new Date(startDateStr);
         this.container = document.getElementById(containerId);
-        this.lastSecond = -1;
 
         if (this.container) {
             this.init();
@@ -12,7 +11,6 @@ class LoveTimer {
     }
 
     init() {
-        // Render the skeleton
         this.container.innerHTML = `
             <div class="love-timer-wrapper">
                 <div class="lt-header">记录我们的点点滴滴</div>
@@ -52,68 +50,63 @@ class LoveTimer {
             </div>
         `;
 
-        // Start loop
         this.update();
         setInterval(() => this.update(), 1000);
     }
 
     update() {
         const now = new Date();
-        let diff = now - this.startDate;
 
-        // If future date, just show 0 or handle logic.
-        // Assuming we want to show "time since", if it's negative, it means "starts in".
-        // But user wants a memorial, so usually it counts up.
-        // If the user sets a future date, we'll just show 0s or countdown.
-        // Let's assume we want absolute difference for "duration".
+        // Handle swap for absolute difference
+        let d1 = new Date(this.startDate);
+        let d2 = new Date(now);
 
-        const isFuture = diff < 0;
-        diff = Math.abs(diff);
+        if (d1 > d2) {
+             let temp = d1;
+             d1 = d2;
+             d2 = temp;
+        }
 
-        // Calculate units
-        const sec = 1000;
-        const min = sec * 60;
-        const hour = min * 60;
-        const day = hour * 24;
-
-        // Simple approximation for Year/Month (not perfect due to leap years/varying months but standard for simple JS timers)
-        // A more robust way is getting full years, then full months, etc.
-
-        let d1 = new Date(Math.min(now, this.startDate));
-        let d2 = new Date(Math.max(now, this.startDate));
-
-        let years = d2.getFullYear() - d1.getFullYear();
-        let months = d2.getMonth() - d1.getMonth();
+        // Calculate differences
+        let seconds = d2.getSeconds() - d1.getSeconds();
+        let minutes = d2.getMinutes() - d1.getMinutes();
+        let hours = d2.getHours() - d1.getHours();
         let days = d2.getDate() - d1.getDate();
+        let months = d2.getMonth() - d1.getMonth();
+        let years = d2.getFullYear() - d1.getFullYear();
 
+        // Adjust for negative values
+        if (seconds < 0) {
+            seconds += 60;
+            minutes--;
+        }
+        if (minutes < 0) {
+            minutes += 60;
+            hours--;
+        }
+        if (hours < 0) {
+            hours += 24;
+            days--;
+        }
         if (days < 0) {
-            months--;
-            // Get days in previous month
+            // Get last day of previous month relative to d2
+            // d2.getMonth() returns 0-11.
+            // new Date(year, month, 0) returns last day of previous month index.
+            // If d2 is Dec (11), we want days in Nov (10).
+            // new Date(2025, 11, 0) -> Nov 30. Correct.
             let prevMonth = new Date(d2.getFullYear(), d2.getMonth(), 0);
             days += prevMonth.getDate();
+            months--;
         }
         if (months < 0) {
-            years--;
             months += 12;
+            years--;
         }
 
-        let hours = d2.getHours() - d1.getHours();
-        if (hours < 0) {
-            days--;
-            hours += 24;
-        }
-
-        let minutes = d2.getMinutes() - d1.getMinutes();
-        if (minutes < 0) {
-            hours--;
-            minutes += 60;
-        }
-
-        let seconds = d2.getSeconds() - d1.getSeconds();
-        if (seconds < 0) {
-            minutes--;
-            seconds += 60;
-        }
+        // Sanity Check
+        if (days < 0) days = 0;
+        if (months < 0) months = 0;
+        if (years < 0) years = 0;
 
         // Update DOM
         this.setText(`${this.container.id}-year`, years);
@@ -145,13 +138,11 @@ class LoveTimer {
         sheep.className = 'lt-floating-sheep';
         sheep.innerText = '+1 🐑';
 
-        // Randomize slight x position
         const randomX = (Math.random() - 0.5) * 20;
         sheep.style.left = `${randomX}px`;
 
         point.appendChild(sheep);
 
-        // Remove after animation
         setTimeout(() => {
             sheep.remove();
         }, 1500);

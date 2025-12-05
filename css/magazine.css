@@ -342,3 +342,335 @@ a {
     .toc-title { font-size: 2rem; }
     .toc-card { height: 350px; }
 }
+
+/* =========================================
+   7. 3D BOOK VIEWER (Manga)
+   ========================================= */
+.book-stage {
+    perspective: 2000px;
+    width: 100vw;
+    height: 85vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    margin-top: 60px; /* Header space */
+}
+
+.book-wrapper {
+    position: relative;
+    width: 1000px; /* Desktop Spread Width */
+    height: 700px;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Mobile: Single Page View adjustments are handled via JS sizing or Media Queries */
+@media (max-width: 1100px) {
+    .book-wrapper {
+        width: 500px;
+        height: 700px;
+    }
+}
+@media (max-width: 600px) {
+    .book-wrapper {
+        width: 90vw;
+        height: 70vh;
+    }
+}
+
+.book-page {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    background: white;
+    transform-origin: center left; /* Flip from spine */
+    transform-style: preserve-3d;
+    transition: transform 1.2s cubic-bezier(0.15, 1, 0.3, 1), z-index 0s 0.6s;
+    cursor: pointer;
+    box-shadow: inset 20px 0 50px rgba(0,0,0,0.05), -5px 0 15px rgba(0,0,0,0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    backface-visibility: hidden; /* Hide back when flipped */
+    z-index: 1;
+}
+
+/* Right pages (Odd numbers) are normally on the right stack */
+.book-page.right-page {
+    left: 50%;
+    transform-origin: left;
+}
+
+/* Left pages (Even numbers) are on the left stack (flipped open) */
+.book-page.left-page {
+    left: 50%; /* Positioned at spine */
+    transform-origin: left;
+}
+
+/* States */
+.page-flipped {
+    transform: rotateY(-180deg);
+    z-index: 10;
+}
+
+/* Content inside Page */
+.page-content {
+    width: 100%;
+    height: 100%;
+    padding: 40px;
+    overflow-y: auto;
+    position: relative;
+    background: #fff;
+    border-left: 1px solid #f0f0f0;
+}
+.page-content.verso { /* Left page content styling */
+    border-right: 1px solid #f0f0f0;
+    border-left: none;
+}
+
+/* Comic Styling reused */
+.comic-panel {
+    border: 3px solid #222;
+    padding: 15px;
+    margin-bottom: 20px;
+    background: #fff;
+    box-shadow: 5px 5px 0 rgba(0,0,0,0.1);
+}
+
+.page-number {
+    position: absolute;
+    bottom: 20px;
+    font-family: var(--font-serif);
+    color: #999;
+}
+.right-page .page-number { right: 20px; }
+.left-page .page-number { left: 20px; }
+
+/* Control Arrows */
+.book-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 100;
+    transition: all 0.3s;
+}
+.book-nav-btn:hover { transform: translateY(-50%) scale(1.1); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+.nav-prev { left: 20px; }
+.nav-next { right: 20px; }
+
+/* Mobile Optimization for Book */
+@media (max-width: 1100px) {
+    .book-page {
+        width: 100%;
+        left: 0 !important;
+        transform-origin: left;
+    }
+    .page-flipped {
+        transform: rotateY(-180deg); /* Full flip off screen or stack? */
+        /* For mobile stack, we might just slide or fade, but user wants flip */
+        /* 3D flip on single stack is tricky. Let's do a Z-stack pile */
+    }
+    /* Simple Z-Stack for Mobile */
+    .mobile-stack-mode .book-page {
+        transform-origin: bottom center;
+        transition: transform 0.6s ease;
+    }
+}
+
+/* =========================================
+   8. LOVE TIMER (Apple Style)
+   ========================================= */
+.love-timer-wrapper {
+    text-align: center;
+    width: 100%;
+    padding: 20px;
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    border: 1px solid rgba(255,255,255,0.5);
+    margin-top: 20px;
+}
+
+.lt-header {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-light);
+    margin-bottom: 5px;
+}
+
+.lt-subheader {
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-family: var(--font-serif);
+    color: var(--text-main);
+    margin-bottom: 25px;
+}
+
+.lt-grid {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+}
+
+.lt-box {
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(5px);
+    padding: 15px 10px;
+    border-radius: 12px;
+    min-width: 60px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    border: 1px solid rgba(255,255,255,1);
+}
+
+.lt-box.relative { position: relative; }
+
+.lt-num {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-main);
+    font-family: var(--font-sans); /* Use Sans for digits like Apple */
+    line-height: 1.2;
+}
+.lt-num.highlight {
+    color: var(--accent-gold); /* Or custom orange/yellow from image */
+}
+
+.lt-label {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    margin-top: 5px;
+}
+
+.lt-footer {
+    font-size: 0.8rem;
+    color: #999;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    padding-top: 10px;
+}
+
+/* Sheep Animation */
+.lt-sheep-spawn-point {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 0;
+    height: 0;
+    overflow: visible;
+}
+
+.lt-floating-sheep {
+    position: absolute;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--accent-pink);
+    white-space: nowrap;
+    animation: floatUpFade 1.5s ease-out forwards;
+}
+
+@keyframes floatUpFade {
+    0% { transform: translateY(0) scale(0.8); opacity: 0; }
+    20% { opacity: 1; transform: translateY(-10px) scale(1.1); }
+    100% { transform: translateY(-40px) scale(1); opacity: 0; }
+}
+
+/* =========================================
+   9. EXTRACTED BOOK CSS (Moved from js/book.js)
+   ========================================= */
+    .book-sheet {
+        position: absolute;
+        top: 0;
+        right: 0; /* Anchored right for spread logic? No, center. */
+        width: 50%; /* Each sheet is half the book width? */
+        /* Actually, in 3D book:
+           The "Spine" is center.
+           The Sheet width = Page Width.
+           Transform Origin = Left.
+           Initial Position = Right side of spine.
+        */
+        width: 500px;
+        height: 100%;
+        left: 50%; /* Starts at spine */
+        transform-origin: left center;
+        transform-style: preserve-3d;
+        transition: transform 0.6s cubic-bezier(0.645, 0.045, 0.355, 1);
+    }
+
+    @media(max-width: 1100px) {
+        .book-sheet {
+             width: 100%;
+             left: 0;
+             /* For mobile, we might not do side-by-side.
+                If we use the same logic, "flipped" rotates -180deg.
+                On mobile, -180deg hides it? Or we show back?
+                "Back" of sheet is Page 2.
+                If we want single page view, this 3D structure is hard.
+             */
+        }
+        /* Mobile Override: Slide Stack instead of Flip? */
+        /* User asked for "Flip". Let's try 3D flip on mobile too, but full width. */
+    }
+
+    .sheet-side {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        background: white;
+        box-shadow: inset 5px 0 10px rgba(0,0,0,0.05); /* Spine shadow */
+        border: 1px solid #ddd;
+    }
+
+    .sheet-front {
+        z-index: 2;
+        /* Default visible */
+    }
+
+    .sheet-back {
+        z-index: 1;
+        transform: rotateY(180deg);
+        box-shadow: inset -5px 0 10px rgba(0,0,0,0.05); /* Spine shadow on back */
+    }
+
+    .flipped {
+        transform: rotateY(-180deg);
+    }
+
+    /* Content Styling */
+    .comic-header { border-bottom: 2px solid var(--accent-purple); margin-bottom: 15px; padding-bottom: 5px; display:flex; justify-content:space-between; align-items:flex-end; }
+    .comic-date { font-family: var(--font-serif); font-size: 1.4rem; font-weight: bold; }
+    .comic-title-sm { color: #666; font-size: 0.9rem; }
+
+    .chat-row { display: flex; margin-bottom: 15px; align-items: flex-start; gap: 10px; }
+    .row-right { flex-direction: row-reverse; }
+    .chat-avatar { width: 40px; height: 40px; border-radius: 50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; color:white; font-size:1.2rem; }
+    .avi-shepherd { background: var(--accent-purple); }
+    .avi-sheep { background: var(--accent-pink); }
+
+    .chat-bubble { padding: 10px 15px; border-radius: 15px; font-size: 0.95rem; max-width: 80%; line-height: 1.5; position: relative; }
+    .bubble-shepherd { background: #f3f0ff; color: #4a148c; border-top-right-radius: 0; }
+    .bubble-sheep { background: #fff0f5; color: #880e4f; border-top-left-radius: 0; }
+
+    .img-sketch { width: 100%; border: 5px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transform: rotate(-1deg); margin: 10px 0; }
+
+    .page-footer { position:absolute; bottom: 15px; width: 100%; text-align: center; color: #ccc; font-size: 0.8rem; left:0; }
