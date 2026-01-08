@@ -1,0 +1,28 @@
+{
+  "name": "love-story-backend",
+  "version": "1.0.0",
+  "description": "Cloudflare Workers backend for Love Story authentication",
+  "main": "worker.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "d1:create": "wrangler d1 create love-story-db",
+    "d1:query": "wrangler d1 execute love-story-db --file=schema.sql",
+    "d1:query:dev": "wrangler d1 execute love-story-db-dev --file=schema.sql",
+    "d1:console": "wrangler d1 execute love-story-db --command"
+  },
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "authentication",
+    "api"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  },
+  "dependencies": {
+    "itty-router": "^4.0.20"
+  }
+}

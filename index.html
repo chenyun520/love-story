@@ -7,6 +7,7 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Didot:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/magazine.css">
+    <link rel="stylesheet" href="css/auth.css">
     <style>
         /* Shake Animation for Login */
         .shake { animation: shake 0.5s; }
@@ -108,16 +109,26 @@
             <div id="loginTimer" style="width: 100%;"></div>
 
             <div class="login-form" style="width: 100%; margin-top: 20px;">
-                <p style="color: var(--text-light); margin-bottom: 5px;">请输入访问密码</p>
+                <p style="color: var(--text-light); margin-bottom: 5px;">请选择登录方式</p>
+
+                <!-- 账号登录按钮 -->
+                <button id="btnAccountLogin" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">
+                    📝 账号登录/注册
+                </button>
+
+                <!-- 管理员密码登录 -->
+                <div style="text-align: center; margin: 15px 0; color: var(--text-light); font-size: 14px;">
+                    ──── 或 ────
+                </div>
 
                 <div class="input-group">
-                    <input type="password" id="passwordInput" placeholder="● ● ● ● ● ●" maxlength="6">
+                    <input type="password" id="passwordInput" placeholder="管理员密码 (可选)" maxlength="6">
                 </div>
 
                 <div id="loginError" class="error-msg"></div>
 
-                <button id="btnLogin" class="btn btn-primary" style="width: 100%; margin-top: 5px;">
-                    OPEN MAGAZINE
+                <button id="btnLogin" class="btn btn-secondary" style="width: 100%; margin-top: 5px; font-size: 14px;">
+                    🔑 管理员登录
                 </button>
             </div>
         </div>
@@ -196,14 +207,20 @@
 
     <script src="js/seasons.js"></script>
     <script src="js/love_timer.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/auth-ui.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const passwordInput = document.getElementById('passwordInput');
             const btnLogin = document.getElementById('btnLogin');
+            const btnAccountLogin = document.getElementById('btnAccountLogin');
             const loginError = document.getElementById('loginError');
             const loginSection = document.getElementById('loginSection');
             const tocSection = document.getElementById('tocSection');
             const carouselTrack = document.getElementById('carouselTrack');
+
+            // 配置 API 地址（部署后需要修改为实际的 Worker URL）
+            // authService.setApiUrl('https://love-story-api.gaolujie26.workers.dev');
 
             // --- CAROUSEL SETUP ---
             const images = [
@@ -233,7 +250,13 @@
 
 
             // --- LOGIN LOGIC ---
-            if (sessionStorage.getItem('isLoggedIn') === 'true') {
+
+            // 检查账号登录状态
+            if (authService.isLoggedIn()) {
+                showTOC(false);
+            }
+            // 检查管理员密码登录状态
+            else if (sessionStorage.getItem('isLoggedIn') === 'true') {
                 showTOC(false);
             }
 
@@ -265,6 +288,11 @@
             btnLogin.addEventListener('click', login);
             passwordInput.addEventListener('keypress', (e) => {
                 if(e.key === 'Enter') login();
+            });
+
+            // 账号登录按钮
+            btnAccountLogin.addEventListener('click', () => {
+                authUI.showLogin();
             });
         });
     </script>
