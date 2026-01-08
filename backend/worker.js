@@ -23,30 +23,6 @@ async function hashPassword(password) {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// 生成 JWT Token
-async function generateToken(userId, username) {
-  const header = {
-    alg: 'HS256',
-    typ: 'JWT'
-  };
-
-  const payload = {
-    userId: userId,
-    username: username,
-    iat: Math.floor(Date.now() / 1000),
-    exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60) // 7天过期
-  };
-
-  const secret = await getSecret();
-
-  const encodedHeader = btoa(JSON.stringify(header));
-  const encodedPayload = btoa(JSON.stringify(payload));
-
-  const signature = await hmacSha256(`${encodedHeader}.${encodedPayload}`, secret);
-
-  return `${encodedHeader}.${encodedPayload}.${signature}`;
-}
-
 // HMAC SHA256 签名
 async function hmacSha256(message, secret) {
   const encoder = new TextEncoder();
@@ -67,12 +43,36 @@ async function hmacSha256(message, secret) {
 }
 
 // 获取密钥（从环境变量或使用默认值）
-async function getSecret() {
-  return env.JWT_SECRET || 'love-story-secret-key-change-in-production';
+function getSecret(env) {
+  return env?.JWT_SECRET || 'love-story-secret-key-change-in-production';
+}
+
+// 生成 JWT Token
+async function generateToken(userId, username, env) {
+  const header = {
+    alg: 'HS256',
+    typ: 'JWT'
+  };
+
+  const payload = {
+    userId: userId,
+    username: username,
+    iat: Math.floor(Date.now() / 1000),
+    exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60) // 7天过期
+  };
+
+  const secret = getSecret(env);
+
+  const encodedHeader = btoa(JSON.stringify(header));
+  const encodedPayload = btoa(JSON.stringify(payload));
+
+  const signature = await hmacSha256(`${encodedHeader}.${encodedPayload}`, secret);
+
+  return `${encodedHeader}.${encodedPayload}.${signature}`;
 }
 
 // 验证 JWT Token
-async function verifyToken(token) {
+async function verifyToken(token, env) {
   try {
     const [encodedHeader, encodedPayload, signature] = token.split('.');
 
@@ -80,7 +80,7 @@ async function verifyToken(token) {
       return null;
     }
 
-    const secret = await getSecret();
+    const secret = getSecret(env);
     const expectedSignature = await hmacSha256(`${encodedHeader}.${encodedPayload}`, secret);
 
     if (signature !== expectedSignature) {
@@ -116,7 +116,7 @@ router.get('/', () => {
 });
 
 // ==================== 用户注册 ====================
-router.post('/api/auth/register', async (request) => {
+router.post('/api/auth/register', async (request, env) => {
   try {
     const { username, email, password } = await request.json();
 
@@ -178,7 +178,7 @@ router.post('/api/auth/register', async (request) => {
     ).bind(username).first();
 
     // 生成 Token
-    const token = await generateToken(newUser.id, newUser.username);
+    const token = await generateToken(newUser.id, newUser.username, env);
 
     return Response.json({
       success: true,
@@ -204,7 +204,7 @@ router.post('/api/auth/register', async (request) => {
 });
 
 // ==================== 用户登录 ====================
-router.post('/api/auth/login', async (request) => {
+router.post('/api/auth/login', async (request, env) => {
   try {
     const { username, password } = await request.json();
 
@@ -238,7 +238,7 @@ router.post('/api/auth/login', async (request) => {
     }
 
     // 生成 Token
-    const token = await generateToken(user.id, user.username);
+    const token = await generateToken(user.id, user.username, env);
 
     // 更新最后登录时间
     await env.DB.prepare(
@@ -268,7 +268,7 @@ router.post('/api/auth/login', async (request) => {
 });
 
 // ==================== 验证 Token ====================
-router.get('/api/auth/verify', async (request) => {
+router.get('/api/auth/verify', async (request, env) => {
   try {
     const authHeader = request.headers.get('Authorization');
 
@@ -280,7 +280,7 @@ router.get('/api/auth/verify', async (request) => {
     }
 
     const token = authHeader.substring(7);
-    const payload = await verifyToken(token);
+    const payload = await verifyToken(token, env);
 
     if (!payload) {
       return Response.json({
@@ -323,7 +323,7 @@ router.get('/api/auth/verify', async (request) => {
 });
 
 // ==================== 获取用户信息 ====================
-router.get('/api/user/profile', async (request) => {
+router.get('/api/user/profile', async (request, env) => {
   try {
     const authHeader = request.headers.get('Authorization');
 
@@ -335,7 +335,7 @@ router.get('/api/user/profile', async (request) => {
     }
 
     const token = authHeader.substring(7);
-    const payload = await verifyToken(token);
+    const payload = await verifyToken(token, env);
 
     if (!payload) {
       return Response.json({
@@ -379,7 +379,7 @@ router.get('/api/user/profile', async (request) => {
 });
 
 // ==================== 更新用户信息 ====================
-router.put('/api/user/profile', async (request) => {
+router.put('/api/user/profile', async (request, env) => {
   try {
     const authHeader = request.headers.get('Authorization');
 
@@ -391,7 +391,7 @@ router.put('/api/user/profile', async (request) => {
     }
 
     const token = authHeader.substring(7);
-    const payload = await verifyToken(token);
+    const payload = await verifyToken(token, env);
 
     if (!payload) {
       return Response.json({
