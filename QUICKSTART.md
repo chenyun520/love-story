@@ -6,9 +6,9 @@
 
 在开始之前，确保你已完成：
 
-- [x] Cloudflare 账号（免费即可注册）
-- [x] 已安装 Node.js 和 npm
-- [x] 项目文件夹已通过 GitHub Desktop 克隆到本地
+- [X] Cloudflare 账号（免费即可注册）
+- [X] 已安装 Node.js 和 npm
+- [X] 项目文件夹已通过 GitHub Desktop 克隆到本地
 
 ---
 
@@ -19,11 +19,13 @@
 按 `Win + R`，输入 `powershell` 或 `cmd`，回车。
 
 **进入项目目录：**
+
 ```bash
 cd "F:\新建文件夹\范小羊\love-story"
 ```
 
 **确认当前位置：**
+
 ```bash
 dir
 ```
@@ -41,6 +43,7 @@ npm install -g wrangler
 **说明：** 这会安装 Cloudflare 的命令行工具，可能需要 1-2 分钟。
 
 **验证安装：**
+
 ```bash
 wrangler --version
 ```
@@ -48,6 +51,7 @@ wrangler --version
 应该显示类似 `4.xx.x` 的版本号。
 
 **如果失败：**
+
 - 确保 npm 已安装：`npm --version`
 - 尝试重新安装：`npm install -g wrangler`
 
@@ -60,16 +64,19 @@ wrangler login
 ```
 
 **会发生什么：**
+
 1. 浏览器自动打开
 2. 显示 Cloudflare 授权页面
 3. 点击 "授权" 或 "Authorize"
 4. 授权成功后关闭浏览器
 
 **如果浏览器没自动打开：**
+
 - 复制终端中显示的 URL
 - 手动粘贴到浏览器地址栏打开
 
 **验证登录：**
+
 ```bash
 wrangler whoami
 ```
@@ -86,6 +93,7 @@ dir
 ```
 
 **你应该看到这些文件：**
+
 - worker.js
 - schema.sql
 - wrangler.toml
@@ -103,6 +111,7 @@ wrangler d1 create love-story-db
 ```
 
 **执行后会显示：**
+
 ```
 ✅ Successfully created DB 'love-story-db'
 
@@ -115,6 +124,7 @@ https://dash.cloudflare.com/...
 ### ⭐ 关键操作：复制 database_id
 
 **非常重要！**
+
 1. 复制 `database_id =` 后面引号中的内容
 2. 例如：`a1b2c3d4-e5f6-7890-abcd-ef1234567890`
 3. **保存到记事本**，稍后会用到
@@ -124,21 +134,25 @@ https://dash.cloudflare.com/...
 ### 第 6 步：编辑配置文件 wrangler.toml
 
 **用记事本或 VS Code 打开文件：**
+
 ```
 backend\wrangler.toml
 ```
 
 **找到这一行：**
+
 ```toml
 database_id = "YOUR_DATABASE_ID"
 ```
 
 **替换为你的真实 database_id：**
+
 ```toml
 database_id = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
 ```
 
 **完整示例：**
+
 ```toml
 [[d1_databases]]
 binding = "DB"
@@ -159,6 +173,7 @@ wrangler d1 create love-story-db-dev
 同样会返回一个 `database_id`，复制它。
 
 **再次编辑 `wrangler.toml`**，找到：
+
 ```toml
 database_id = "YOUR_DEV_DATABASE_ID"
 ```
@@ -188,17 +203,20 @@ wrangler d1 execute love-story-db --file=schema.sql
 ```
 
 **成功后显示：**
+
 ```
 🚣 Executing on love-story-db (a1b2c3d4...):
 ✅ Successfully executed 13 commands.
 ```
 
 **验证表是否创建成功：**
+
 ```bash
 wrangler d1 execute love-story-db --command "SELECT name FROM sqlite_master WHERE type='table';"
 ```
 
 **应该看到：**
+
 ```
 ✅ Successfully executed the command.
 
@@ -220,11 +238,13 @@ wrangler secret put JWT_SECRET
 ```
 
 **会提示：**
+
 ```
 Enter the secret value you would like assigned to JWT_SECRET on the production script:
 ```
 
 **输入一个强密码（至少 32 个字符），例如：**
+
 ```
 my-super-secret-love-story-jwt-key-2024
 ```
@@ -242,11 +262,13 @@ npm run deploy
 ```
 
 **或者：**
+
 ```bash
 wrangler deploy
 ```
 
 **部署过程：**
+
 ```
 ⛅️ wrangler 4.xx.x
 -------------------
@@ -258,6 +280,7 @@ wrangler deploy
 ### ⭐ 关键操作：复制 Worker URL
 
 **非常重要！**
+
 1. 复制完整的 URL
 2. 例如：`https://love-story-api.abc123defg.workers.dev`
 3. **保存到记事本**，下一步要用
@@ -269,11 +292,13 @@ wrangler deploy
 **方法 1：浏览器测试**
 
 在浏览器地址栏输入你的 Worker URL：
+
 ```
 https://love-story-api.你的子域名.workers.dev/
 ```
 
 **应该看到：**
+
 ```json
 {
   "status": "ok",
@@ -296,6 +321,7 @@ https://love-story-api.你的子域名.workers.dev/
    ```
 
 **全部测试通过会显示：**
+
 ```
 === Love Story API 测试 ===
 
@@ -379,6 +405,7 @@ https://love-story-api.你的子域名.workers.dev/
 5. 点击 "注册"
 
 **成功标志：**
+
 - ✅ 模态框关闭
 - ✅ 自动进入主页（显示目录）
 - ✅ 可以浏览漫画和游戏
@@ -447,6 +474,7 @@ npm run deploy
 **原因：** wrangler 没有正确安装或不在系统路径中
 
 **解决：**
+
 ```bash
 # 重新安装
 npm install -g wrangler
@@ -465,6 +493,7 @@ npm update -g wrangler
 **原因：** 未登录或登录过期
 
 **解决：**
+
 ```bash
 # 检查登录状态
 wrangler whoami
@@ -480,6 +509,7 @@ wrangler login
 **原因：** 未登录或账号权限不足
 
 **解决：**
+
 ```bash
 # 1. 确认已登录
 wrangler whoami
@@ -498,6 +528,7 @@ wrangler d1 create love-story-db
 **原因：** 不在 backend 目录中
 
 **解决：**
+
 ```bash
 # 确认当前位置
 pwd
@@ -516,6 +547,7 @@ dir wrangler.toml
 **原因：** 配置错误或 network 问题
 
 **解决：**
+
 ```bash
 # 1. 检查配置文件
 cat wrangler.toml
@@ -535,6 +567,7 @@ wrangler deploy
 **原因：** URL 配置错误或 Worker 未正确部署
 
 **解决：**
+
 ```bash
 # 1. 确认 Worker URL 正确
 # 浏览器访问：https://你的URL/
@@ -554,6 +587,7 @@ wrangler deploy
 **原因：** 前端域名未在 CORS 白名单中
 
 **解决：**
+
 ```bash
 # 1. 检查 worker.js 中的 CORS 配置
 # 确认允许所有源：'*'
@@ -571,6 +605,7 @@ npm run deploy
 **原因：** Token 存储问题或密码验证错误
 
 **解决：**
+
 ```bash
 # 1. 检查浏览器控制台（F12）
 # 查看 localStorage 中是否有 token

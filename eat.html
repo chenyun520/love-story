@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小羊吃什么 - Love Story</title>
+    <link rel="icon" type="image/png" href="image/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Didot:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/magazine.css">
+    <link rel="stylesheet" href="css/eat.css">
+</head>
+<body>
+    <script src="js/seasons.js"></script>
+
+    <nav class="header-nav eat-header">
+        <a href="index.html" class="btn btn-ghost eat-back-btn">← 目录</a>
+        <div class="eat-title">小羊吃什么</div>
+        <div class="eat-header-spacer"></div>
+    </nav>
+
+    <main class="eat-page">
+        <section class="eat-card">
+            <div class="eat-card-head">
+                <div class="eat-card-kicker">TODAY'S MENU</div>
+                <h1 class="eat-card-title">输入今天的状态，让小羊安排</h1>
+                <p class="eat-card-desc">支持“再来一次”，也会展示全部备选项。</p>
+            </div>
+
+            <div class="eat-form" id="eatForm">
+                <div class="eat-field">
+                    <label class="eat-label" for="weekdaySelect">今天星期几</label>
+                    <select id="weekdaySelect" class="eat-select">
+                        <option value="1">星期一</option>
+                        <option value="2">星期二</option>
+                        <option value="3">星期三</option>
+                        <option value="4">星期四</option>
+                        <option value="5">星期五</option>
+                        <option value="6">星期六</option>
+                        <option value="0">星期日</option>
+                    </select>
+                </div>
+
+                <div class="eat-field">
+                    <label class="eat-label" for="weatherSelect">今天天气怎么样</label>
+                    <select id="weatherSelect" class="eat-select">
+                        <option value="sunny">晴朗</option>
+                        <option value="cloudy">多云</option>
+                        <option value="rainy">下雨</option>
+                        <option value="hot">炎热</option>
+                        <option value="cold">寒冷</option>
+                        <option value="windy">大风</option>
+                        <option value="custom">自定义</option>
+                    </select>
+                    <input id="weatherCustom" class="eat-input hidden" type="text" maxlength="20" placeholder="例如：小雨 / 雾霾 / 闷热">
+                </div>
+
+                <div class="eat-field">
+                    <label class="eat-label" for="moodSelect">今天心情怎么样</label>
+                    <select id="moodSelect" class="eat-select">
+                        <option value="happy">开心</option>
+                        <option value="calm">平静</option>
+                        <option value="tired">有点累</option>
+                        <option value="down">有点丧</option>
+                        <option value="treat">想放纵一下</option>
+                        <option value="custom">自定义</option>
+                    </select>
+                    <input id="moodCustom" class="eat-input hidden" type="text" maxlength="20" placeholder="例如：emo / 很忙 / 很想吃辣">
+                </div>
+
+                <div class="eat-actions">
+                    <button id="btnRecommend" class="btn btn-primary eat-btn-main" type="button">🍽️ 开始推荐</button>
+                    <button id="btnAgain" class="btn btn-ghost" type="button">🔁 再来一次</button>
+                    <button id="btnReset" class="btn btn-ghost" type="button">🧹 清空重填</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="eat-card">
+            <div class="eat-result-head">
+                <h2 class="eat-section-title">智能推荐</h2>
+                <div class="eat-reason" id="recommendReason">填写后点击“开始推荐”</div>
+            </div>
+
+            <div class="eat-recommend-grid">
+                <div class="eat-recommend-card" id="mainRecommendCard"></div>
+                <div class="eat-recommend-card" id="sideRecommendCard"></div>
+            </div>
+        </section>
+
+        <section class="eat-card">
+            <h2 class="eat-section-title">主菜备选项</h2>
+            <div class="eat-options-grid" id="mainOptions"></div>
+        </section>
+
+        <section class="eat-card">
+            <h2 class="eat-section-title">配菜备选项</h2>
+            <div class="eat-options-grid" id="sideOptions"></div>
+        </section>
+    </main>
+
+    <script src="js/auth.js"></script>
+    <script src="js/eat.js"></script>
+</body>
+</html>
+
