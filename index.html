@@ -33,11 +33,19 @@
             animation: marquee 30s linear infinite;
         }
 
+        .carousel-container:hover .carousel-track {
+            animation-play-state: paused;
+        }
+
+        .carousel-container.carousel-paused .carousel-track {
+            animation-play-state: paused;
+        }
+
         .carousel-item {
             display: inline-block;
-            width: 200px;
-            height: 300px;
-            margin: 0 10px;
+            width: clamp(120px, 16vw, 190px);
+            height: clamp(170px, 22vw, 260px);
+            margin: 0 8px;
             background-size: cover;
             background-position: center;
             border-radius: 8px;
@@ -56,10 +64,70 @@
             100% { transform: translateX(-50%); }
         }
 
+        .carousel-preview {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(20, 25, 35, 0.55);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 260ms ease;
+        }
+
+        .carousel-preview.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .carousel-preview-inner {
+            width: min(92vw, 1100px);
+            height: min(84vh, 760px);
+            border-radius: 18px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.92);
+            box-shadow: 0 30px 90px rgba(0,0,0,0.35);
+            border: 1px solid rgba(255,255,255,0.45);
+            transform: translateY(10px) scale(0.96);
+            opacity: 0;
+        }
+
+        .carousel-preview.show .carousel-preview-inner {
+            animation: previewPop 420ms cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
+        }
+
+        @keyframes previewPop {
+            0% { transform: translateY(14px) scale(0.94); opacity: 0; }
+            60% { transform: translateY(0) scale(1.01); opacity: 1; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .carousel-preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transform: scale(1.04);
+            opacity: 0;
+        }
+
+        .carousel-preview.show .carousel-preview-img {
+            animation: previewImg 520ms cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
+        }
+
+        @keyframes previewImg {
+            0% { transform: scale(1.08); opacity: 0; filter: blur(6px); }
+            60% { transform: scale(1.01); opacity: 1; filter: blur(0); }
+            100% { transform: scale(1); opacity: 1; filter: blur(0); }
+        }
+
         /* Cover Image on Login */
         .login-cover-card {
-            width: 300px;
-            height: 400px;
+            width: 100%;
+            max-width: 520px;
+            height: 520px;
             background-image: url('image/cover.png');
             background-size: cover;
             background-position: center;
@@ -95,130 +163,133 @@
         <div class="bg-deco-circle" style="width: 600px; height: 600px; top: -100px; right: -100px;"></div>
         <div class="bg-deco-circle" style="width: 400px; height: 400px; bottom: -50px; left: -50px;"></div>
 
-        <div class="cover-content fade-in" style="display: flex; flex-direction: column; align-items: center; max-width: 600px;">
-
-            <!-- New Cover Image Card -->
-            <div class="login-cover-card">
-                <div class="login-cover-title">
-                    <h2 style="margin:0; font-size: 2rem; font-family: 'Didot', serif;">OUR MEMORY</h2>
-                    <p style="margin:5px 0 0; font-size: 0.9rem; opacity: 0.8;">Love Commemorative Magazine</p>
+        <div class="cover-content fade-in login-split">
+            <div class="login-split-left">
+                <div class="login-cover-card">
+                    <div class="login-cover-title">
+                        <h2 style="margin:0; font-size: 2rem; font-family: 'Didot', serif;">OUR MEMORY</h2>
+                        <p style="margin:5px 0 0; font-size: 0.9rem; opacity: 0.8;">Love Commemorative Magazine</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Login Timer Container -->
-            <div id="loginTimer" style="width: 100%;"></div>
+            <div class="login-split-right">
+                <div id="loginTimer" style="width: 100%;"></div>
 
-            <div class="login-form" style="width: 100%; margin-top: 20px;">
-                <p style="color: var(--text-light); margin-bottom: 5px;">请选择登录方式</p>
+                <div class="login-form" style="width: 100%; margin-top: 20px;">
+                    <p style="color: var(--text-light); margin-bottom: 5px;">请选择登录方式</p>
 
-                <!-- 账号登录按钮 -->
-                <button id="btnAccountLogin" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">
-                    📝 账号登录/注册
-                </button>
+                    <button id="btnAccountLogin" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">
+                        📝 账号登录/注册
+                    </button>
 
-                <!-- 管理员密码登录 -->
-                <div style="text-align: center; margin: 15px 0; color: var(--text-light); font-size: 14px;">
-                    ──── 或 ────
+                    <div style="text-align: center; margin: 15px 0; color: var(--text-light); font-size: 14px;">
+                        ──── 或 ────
+                    </div>
+
+                    <div class="input-group">
+                        <input type="password" id="passwordInput" placeholder="管理员密码 (可选)" maxlength="6">
+                    </div>
+
+                    <div id="loginError" class="error-msg"></div>
+
+                    <button id="btnLogin" class="btn btn-secondary" style="width: 100%; margin-top: 5px; font-size: 14px;">
+                        🔑 管理员登录
+                    </button>
                 </div>
-
-                <div class="input-group">
-                    <input type="password" id="passwordInput" placeholder="管理员密码 (可选)" maxlength="6">
-                </div>
-
-                <div id="loginError" class="error-msg"></div>
-
-                <button id="btnLogin" class="btn btn-secondary" style="width: 100%; margin-top: 5px; font-size: 14px;">
-                    🔑 管理员登录
-                </button>
             </div>
         </div>
     </section>
 
     <!-- SECTION 2: TABLE OF CONTENTS (Revealed after login) -->
     <section id="tocSection" class="toc-section hidden">
-        <div class="toc-header fade-in">
-            <h2 class="toc-title">目录 CONTENTS</h2>
-            <p style="color: var(--text-light); letter-spacing: 2px; margin-top: 10px;">ISSUE 01: BEGINNING</p>
-        </div>
+        <div class="toc-layout">
+            <aside class="toc-side">
+                <div class="carousel-container fade-in" style="margin: 0;">
+                    <div class="carousel-track" id="carouselTrack">
+                        <!-- Images injected via JS -->
+                    </div>
+                </div>
+                <div id="homeTimer" style="max-width: 600px; width:100%;"></div>
+            </aside>
 
-        <div class="toc-grid fade-in" style="animation-delay: 0.2s;">
+            <div class="toc-main">
+                <div class="toc-header fade-in">
+                    <h2 class="toc-title">目录 CONTENTS</h2>
+                    <p style="color: var(--text-light); letter-spacing: 2px; margin-top: 10px;">ISSUE 01: BEGINNING</p>
+                </div>
 
-            <!-- Card 1: Manga -->
-            <a href="manga.html" class="toc-card">
-                <div class="card-img" style="background-image: url('image/cover.png'); background-color: #ffeef0;">
-                    <div class="card-icon">📖</div>
-                </div>
-                <div class="card-content">
-                    <div>
-                        <h3 class="card-title">漫画恋爱史</h3>
-                        <p class="card-desc">从初识到相爱，每一个心动瞬间的漫画记录。</p>
-                    </div>
-                    <div class="card-footer">
-                        READ STORY <span>→</span>
-                    </div>
-                </div>
-            </a>
+                <div class="toc-grid fade-in" style="animation-delay: 0.2s;">
 
-            <!-- Card 2: Games -->
-            <a href="game.html" class="toc-card">
-                <div class="card-img" style="background-color: #f0f7ff;">
-                    <div class="card-icon">🎮</div>
-                </div>
-                <div class="card-content">
-                    <div>
-                        <h3 class="card-title">游戏章节</h3>
-                        <p class="card-desc">包含“工具归位”与全新的“水果派对”挑战。</p>
-                    </div>
-                    <div class="card-footer">
-                        PLAY NOW <span>→</span>
-                    </div>
-                </div>
-            </a>
+                    <a href="manga.html" class="toc-card">
+                        <div class="card-img" style="background-image: url('image/cover.png'); background-color: #ffeef0;">
+                            <div class="card-icon">📖</div>
+                        </div>
+                        <div class="card-content">
+                            <div>
+                                <h3 class="card-title">漫画恋爱史</h3>
+                                <p class="card-desc">从初识到相爱，每一个心动瞬间的漫画记录。</p>
+                            </div>
+                            <div class="card-footer">
+                                READ STORY <span>→</span>
+                            </div>
+                        </div>
+                    </a>
 
-            <!-- Card 3: What to Eat -->
-            <a href="eat.html" class="toc-card">
-                <div class="card-img" style="background-image: url('image/羊 (3).png'); background-color: #fff3e6;">
-                    <div class="card-icon">🍽️</div>
-                </div>
-                <div class="card-content">
-                    <div>
-                        <h3 class="card-title">小羊吃什么</h3>
-                        <p class="card-desc">输入星期、天气和心情，让小羊智能推荐今日菜单。</p>
-                    </div>
-                    <div class="card-footer">
-                        LET'S EAT <span>→</span>
-                    </div>
-                </div>
-            </a>
+                    <a href="game.html" class="toc-card">
+                        <div class="card-img" style="background-color: #f0f7ff;">
+                            <div class="card-icon">🎮</div>
+                        </div>
+                        <div class="card-content">
+                            <div>
+                                <h3 class="card-title">游戏章节</h3>
+                                <p class="card-desc">包含“工具归位”与全新的“水果派对”挑战。</p>
+                            </div>
+                            <div class="card-footer">
+                                PLAY NOW <span>→</span>
+                            </div>
+                        </div>
+                    </a>
 
-            <!-- Card 3: Future -->
-            <div class="toc-card" style="cursor: default;">
-                <div class="card-img" style="background-color: #f9f9f9;">
-                    <div class="card-icon" style="color: #ccc;">🚧</div>
-                </div>
-                <div class="card-content">
-                    <div>
-                        <h3 class="card-title">待开发</h3>
-                        <p class="card-desc">更多精彩内容正在策划中，敬请期待...</p>
+                    <a href="eat.html" class="toc-card">
+                        <div class="card-img" style="background-image: url('image/羊 (3).png'); background-color: #fff3e6;">
+                            <div class="card-icon">🍽️</div>
+                        </div>
+                        <div class="card-content">
+                            <div>
+                                <h3 class="card-title">小羊吃什么</h3>
+                                <p class="card-desc">输入星期、天气和心情，让小羊智能推荐今日菜单。</p>
+                            </div>
+                            <div class="card-footer">
+                                LET'S EAT <span>→</span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <div class="toc-card" style="cursor: default;">
+                        <div class="card-img" style="background-color: #f9f9f9;">
+                            <div class="card-icon" style="color: #ccc;">🚧</div>
+                        </div>
+                        <div class="card-content">
+                            <div>
+                                <h3 class="card-title">待开发</h3>
+                                <p class="card-desc">更多精彩内容正在策划中，敬请期待...</p>
+                            </div>
+                            <div class="card-footer" style="color: #ccc;">
+                                COMING SOON
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-footer" style="color: #ccc;">
-                        COMING SOON
-                    </div>
+
                 </div>
             </div>
-
         </div>
 
-        <!-- Carousel -->
-        <div class="carousel-container fade-in" style="margin-top: 40px;">
-            <div class="carousel-track" id="carouselTrack">
-                <!-- Images injected via JS -->
+        <div id="carouselPreview" class="carousel-preview" aria-hidden="true">
+            <div class="carousel-preview-inner">
+                <img id="carouselPreviewImg" class="carousel-preview-img" alt="照片预览">
             </div>
         </div>
-
-        <!-- Global Love Timer Footer -->
-        <div id="homeTimer" style="margin-top: 50px; max-width: 600px; width:100%;"></div>
-
     </section>
 
     <script src="js/seasons.js"></script>
@@ -253,7 +324,69 @@
                 div.className = 'carousel-item';
                 div.style.backgroundImage = `url('${src}')`;
                 div.style.backgroundColor = '#eee';
+                div.dataset.src = src;
                 carouselTrack.appendChild(div);
+            });
+
+            const carouselContainer = document.querySelector('.carousel-container');
+            const carouselPreview = document.getElementById('carouselPreview');
+            const carouselPreviewImg = document.getElementById('carouselPreviewImg');
+
+            let previewCloseTimer = null;
+
+            function openPreview(src) {
+                if (!carouselPreview || !carouselPreviewImg) return;
+                if (previewCloseTimer) {
+                    clearTimeout(previewCloseTimer);
+                    previewCloseTimer = null;
+                }
+                carouselPreviewImg.src = src;
+                carouselPreview.setAttribute('aria-hidden', 'false');
+                carouselPreview.classList.add('show');
+                if (carouselContainer) carouselContainer.classList.add('carousel-paused');
+            }
+
+            function closePreviewDelayed(delayMs = 160) {
+                if (!carouselPreview) return;
+                if (previewCloseTimer) clearTimeout(previewCloseTimer);
+                previewCloseTimer = setTimeout(() => {
+                    carouselPreview.classList.remove('show');
+                    carouselPreview.setAttribute('aria-hidden', 'true');
+                    if (carouselContainer) carouselContainer.classList.remove('carousel-paused');
+                }, delayMs);
+            }
+
+            carouselTrack.addEventListener('mouseenter', (e) => {
+                const item = e.target.closest('.carousel-item');
+                if (!item) return;
+                openPreview(item.dataset.src);
+            }, true);
+
+            carouselTrack.addEventListener('mouseleave', (e) => {
+                const item = e.target.closest('.carousel-item');
+                if (!item) return;
+                closePreviewDelayed(180);
+            }, true);
+
+            carouselTrack.addEventListener('click', (e) => {
+                const item = e.target.closest('.carousel-item');
+                if (!item) return;
+                openPreview(item.dataset.src);
+            });
+
+            if (carouselPreview) {
+                carouselPreview.addEventListener('mouseenter', () => {
+                    if (previewCloseTimer) {
+                        clearTimeout(previewCloseTimer);
+                        previewCloseTimer = null;
+                    }
+                });
+                carouselPreview.addEventListener('mouseleave', () => closePreviewDelayed(80));
+                carouselPreview.addEventListener('click', () => closePreviewDelayed(0));
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closePreviewDelayed(0);
             });
 
 

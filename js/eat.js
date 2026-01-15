@@ -161,89 +161,72 @@
     return score;
   }
 
-  function getSideWeights(ctx) {
-    const base = new Map();
-    base.set('none', 0.5);
-    const otherBase = 0.5 / (SIDE_DISHES.length - 1);
-    for (const it of SIDE_DISHES) {
-      if (it.id === 'none') continue;
-      base.set(it.id, otherBase);
-    }
-
-    const add = (id, delta) => base.set(id, clampNonNegative((base.get(id) || 0) + delta));
-
-    if (ctx.weatherKey === 'hot') {
-      add('milktea', 0.10);
-      add('coke', 0.08);
-      add('none', 0.05);
-      add('duckhead', -0.05);
-      add('juewei', -0.05);
-      add('zhouheiya', -0.05);
-    }
-
-    if (ctx.weatherKey === 'rainy' || ctx.weatherKey === 'cold') {
-      add('duckhead', 0.08);
-      add('juewei', 0.06);
-      add('zhouheiya', 0.06);
-      add('scallion', 0.04);
-      add('milktea', -0.03);
-      add('coke', -0.03);
-    }
-
-    if (ctx.moodKey === 'tired') {
-      add('none', 0.08);
-      add('coke', 0.02);
-    }
-
-    if (ctx.moodKey === 'happy') {
-      add('milktea', 0.04);
-      add('duckhead', 0.03);
-      add('juewei', 0.03);
-    }
-
-    if (ctx.moodKey === 'treat') {
-      add('duckhead', 0.04);
-      add('juewei', 0.04);
-      add('zhouheiya', 0.04);
-      add('none', -0.04);
-    }
-
-    return SIDE_DISHES.map(side => ({ item: side, weight: base.get(side.id) || 0 }));
+  function pickOne(items, rng = Math.random) {
+    if (!items.length) return null;
+    return items[Math.floor(rng() * items.length)];
   }
 
-  function weightedPickFromTop(scored, topN, rng = Math.random) {
-    const top = [...scored].sort((a, b) => b.score - a.score).slice(0, topN);
-    const min = Math.min(...top.map(t => t.score));
-    const weighted = top.map(t => ({ item: t.item, weight: (t.score - min) + 1 }));
-    return pickWeighted(weighted, rng);
+  function pickSidePureRandom(rng = Math.random) {
+    if (rng() < 0.5) return SIDE_DISHES[0];
+    const others = SIDE_DISHES.slice(1);
+    return pickOne(others, rng);
+  }
+
+  function dishTone(main) {
+    const tags = new Set(main.tags || []);
+    if (main.id === 'jx') return '来点下饭又有锅气的';
+    if (tags.has('hotpot')) return '热热闹闹涮一顿';
+    if (tags.has('soup')) return '暖胃又舒服';
+    if (tags.has('pizza')) return '轻松快乐的';
+    if (tags.has('fried')) return '放纵一下也没关系';
+    if (tags.has('noodle')) return '重口但很治愈';
+    if (tags.has('light')) return '清爽一点刚刚好';
+    return '就顺着感觉吃';
+  }
+
+  function sideTone(side) {
+    if (!side || side.id === 'none') return '配菜就先不加了';
+    if (side.id === 'milktea') return '再来杯奶茶加点甜';
+    if (side.id === 'coke') return '可乐一开，快乐就来';
+    if (side.id === 'scallion') return '加个小葱饼垫垫';
+    if (side.id === 'duckhead') return '再整点鸭头解馋';
+    if (side.id === 'juewei') return '鸭脖安排上';
+    if (side.id === 'zhouheiya') return '周黑鸭来点辣';
+    return '配菜随缘加一点';
+  }
+
+  function buildReason(ctx, main, side) {
+    const base = `今天是${ctx.weekdayLabel}，天气${ctx.weatherLabel}，心情${ctx.moodLabel}。`;
+    const w =
+      ctx.weatherKey === 'rainy' ? '下雨就适合吃点踏实的。' :
+      ctx.weatherKey === 'cold' ? '冷就要吃点热乎的。' :
+      ctx.weatherKey === 'hot' ? '热也要吃得开心一点。' :
+      ctx.weatherKey === 'windy' ? '风大就吃点有安全感的。' :
+      '就按今天的感觉来。';
+    const m =
+      ctx.moodKey === 'tired' ? '省点脑子，直接安排。' :
+      ctx.moodKey === 'down' ? '先把自己哄好最重要。' :
+      ctx.moodKey === 'treat' ? '放纵一下，明天再说。' :
+      ctx.moodKey === 'happy' ? '开心就吃点更满足的。' :
+      '稳稳当当就挺好。';
+    const d = `主菜就选${main.name}：${dishTone(main)}。`;
+    const s = `配菜：${sideTone(side)}。`;
+    return `${base}${w}${m}${d}${s}`;
   }
 
   function buildRecommendation(input, rng = Math.random) {
     const ctx = buildContext(input);
-    const scoredMains = MAIN_DISHES.map(item => ({ item, score: scoreMainDish(item, ctx) }))
-      .sort((a, b) => b.score - a.score);
-
-    const main = weightedPickFromTop(scoredMains, 3, rng);
-    const side = pickWeighted(getSideWeights(ctx), rng);
-
-    const reasonParts = [];
-    reasonParts.push(`${ctx.weekdayLabel}`);
-    reasonParts.push(`${ctx.weatherLabel}`);
-    reasonParts.push(`${ctx.moodLabel}`);
-
-    const moodHint = ctx.moodKey === 'tired' ? '省事一点' : (ctx.moodKey === 'down' ? '暖一暖' : (ctx.moodKey === 'treat' ? '满足一下' : '顺顺心'));
-    const weatherHint = (ctx.weatherKey === 'rainy' || ctx.weatherKey === 'cold') ? '来点热乎的' : (ctx.weatherKey === 'hot' ? '清爽一点' : '随心吃');
-    const reason = `今天是${reasonParts.join(' + ')}，就${weatherHint}，再${moodHint}。`;
-
-    const topIds = scoredMains.slice(0, 3).map(x => x.item.id);
+    const main = pickOne(MAIN_DISHES, rng);
+    const side = pickSidePureRandom(rng);
+    const reason = buildReason(ctx, main, side);
 
     return {
       ctx,
       main,
       side,
       reason,
-      scoredMains,
-      topIds
+      scoredMains: [],
+      topIds: []
     };
   }
 
@@ -330,9 +313,7 @@
     renderRecommendCard(el('mainRecommendCard'), '主菜推荐', rec.main);
     renderRecommendCard(el('sideRecommendCard'), '配菜推荐', rec.side);
 
-    const scoreMap = new Map(rec.scoredMains.map(x => [x.item.id, x.score]));
-    const sortedMainOptions = [...MAIN_DISHES].sort((a, b) => (scoreMap.get(b.id) || 0) - (scoreMap.get(a.id) || 0));
-    renderOptions(el('mainOptions'), sortedMainOptions, rec.topIds, scoreMap);
+    renderOptions(el('mainOptions'), MAIN_DISHES, null, null);
     renderOptions(el('sideOptions'), SIDE_DISHES, null, null);
   }
 

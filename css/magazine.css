@@ -133,6 +133,32 @@ a {
     border-radius: 4px; /* Magazine sharp corners */
 }
 
+.login-split {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 600px;
+}
+
+.login-split-left,
+.login-split-right {
+    width: 100%;
+}
+
+@media (min-width: 1024px) {
+    .cover-content.login-split {
+        max-width: 1200px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 36px;
+        align-items: center;
+        text-align: left;
+    }
+    .login-split-right .login-form {
+        align-items: stretch;
+    }
+}
+
 /* Magazine Masthead */
 .masthead {
     margin-bottom: 40px;
@@ -202,6 +228,7 @@ a {
     background: var(--page-bg);
     z-index: 20;
     overflow-y: auto;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -226,6 +253,60 @@ a {
     gap: 40px;
     max-width: 1200px;
     width: 100%;
+}
+
+.toc-layout {
+    width: 100%;
+    max-width: 1400px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+    align-items: start;
+}
+
+.toc-layout > * {
+    min-width: 0;
+}
+
+.toc-side {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+@media (min-width: 1024px) {
+    .toc-section {
+        padding: 28px 28px;
+        align-items: stretch;
+    }
+    .toc-header {
+        text-align: left;
+        margin-bottom: 16px;
+    }
+    .toc-layout {
+        max-width: none;
+        grid-template-columns: 1fr 1fr;
+        gap: 34px;
+    }
+    .toc-side {
+        position: sticky;
+        top: 30px;
+        align-self: start;
+    }
+    .toc-grid {
+        max-width: none;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 22px;
+    }
+    .toc-card {
+        height: 300px;
+    }
+}
+
+.toc-main {
+    width: 100%;
+    min-width: 0;
 }
 
 .toc-card {
